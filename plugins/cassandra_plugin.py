@@ -107,7 +107,7 @@ def join_cassandra_cluster(cluster_view,
 
 def can_contact_cassandra():
     if os.path.exists("/var/run/cassandra/cassandra.pid"):
-        rc = run_command("/usr/share/clearwater/bin/poll_cassandra.sh --no_grace_period")
+        rc = run_command("/usr/share/clearwater/bin/poll_cassandra.sh --no-grace-period")
         return (rc == 0)
     else:
         # Cassandra isn't even running, let alone contactable
