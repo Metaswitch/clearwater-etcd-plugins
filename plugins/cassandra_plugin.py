@@ -75,6 +75,16 @@ def join_cassandra_cluster(cluster_view,
         doc["listen_address"] = ip
         doc["seed_provider"][0]["parameters"][0]["seeds"] = seeds_list_str
         doc["endpoint_snitch"] = "GossipingPropertyFileSnitch"
+       
+        # Work out the timeout from the target_latency_us value (assuming
+        # 100000 if it isn't set)
+        get_latency_cmd = "target_latency_us=100000; . /etc/clearwater/config; echo -n $target_latency_us"
+        latency = subprocess.check_output(get_latency_cmd,
+                                          shell=True,
+                                          stderr=subprocess.STDOUT)
+
+        timeout = int(latency) * 4 / 5
+        doc["read_request_timeout_ms"] = timeout
 
         # Write back to cassandra.yaml.
         with open(cassandra_yaml_file, "w") as f:
