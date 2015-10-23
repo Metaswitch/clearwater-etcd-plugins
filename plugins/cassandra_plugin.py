@@ -41,6 +41,7 @@ import logging
 import time
 import yaml
 import os
+import subprocess
 
 _log = logging.getLogger("cassandra_plugin")
 
@@ -83,8 +84,14 @@ def join_cassandra_cluster(cluster_view,
                                           shell=True,
                                           stderr=subprocess.STDOUT)
 
-        timeout = int(latency) * 4 / 5
-        doc["read_request_timeout_ms"] = timeout
+        try:
+            # We want the timeout value to be 4/5ths the maximum acceptable time
+            # of a HTTP request (which is 5 * target latency)
+            timeout = (int(latency) / 1000 ) * 4
+        except ValueError:
+            timeout = 400
+
+        doc["read_request_timeout_in_ms"] = timeout
 
         # Write back to cassandra.yaml.
         with open(cassandra_yaml_file, "w") as f:
