@@ -32,6 +32,10 @@
 
 from metaswitch.clearwater.cluster_manager.plugin_base import SynchroniserPluginBase
 from metaswitch.clearwater.etcd_shared.plugin_utils import run_command
+import subprocess
+import logging
+
+_log = logging.getLogger("cassandra_failed_plugin")
 
 class CassandraFailedPlugin(SynchroniserPluginBase):
     def __init__(self, key, ip):
@@ -56,5 +60,19 @@ class CassandraFailedPlugin(SynchroniserPluginBase):
     def on_leaving_cluster(self, cluster_view):
         # We must remove the node from the cassandra cluster. Get the node's ID
         # from nodetool status, then remove it with nodetool remove
-        command = "nodetool removenode $(nodetool status | grep " + self._ip + " | sed -e's/ \+/ /g' | cut -f 7 -d ' ')"
-        run_command(command)
+        try:
+            output = subprocess.check_output("nodetool status | grep " + self._ip,
+                                             shell=True,
+                                             stderr=subprocess.STDOUT)
+            _log.debug("Nodetool status succeeded and printed output {!r}".
+                       format(output))
+        except subprocess.CalledProcessError:
+            _log.debug("hit error")
+
+        if output != "":
+            # Pull the UUID from the output
+            #status_output = output.split()
+            for value in output.split():
+                if "-" in value:
+                    run_command("nodetool removenode " + value)
+                    break
