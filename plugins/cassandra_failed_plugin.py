@@ -71,7 +71,6 @@ class CassandraFailedPlugin(SynchroniserPluginBase):
 
         if output != "":
             # Pull the UUID from the output
-            #status_output = output.split()
             for value in output.split():
                 if "-" in value:
                     run_command("nodetool removenode " + value)
