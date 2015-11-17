@@ -33,7 +33,7 @@
 # as those licenses appear in the file LICENSE-OPENSSL.
 
 from metaswitch.clearwater.cluster_manager.plugin_base import SynchroniserPluginBase
-from metaswitch.clearwater.etcd_shared.plugin_utils import run_command
+from metaswitch.clearwater.etcd_shared.plugin_utils import run_command, safely_write
 from metaswitch.clearwater.cluster_manager.alarms import issue_alarm
 from metaswitch.clearwater.cluster_manager import pdlogs, alarm_constants, constants
 from metaswitch.clearwater.cluster_manager.plugin_utils import WARNING_HEADER
@@ -94,15 +94,12 @@ def join_cassandra_cluster(cluster_view,
         doc["read_request_timeout_in_ms"] = timeout
 
         # Write back to cassandra.yaml.
-        with open(cassandra_yaml_file, "w") as f:
-            f.write(WARNING_HEADER + "\n")
-            yaml.dump(doc, f)
-
+        contents = WARNING_HEADER + "\n" + yaml.dump(doc)
         topology = WARNING_HEADER + "\n" + "dc={}\nrack=RAC1\n".format(site_name)
-
-        with open(cassandra_topology_file, "w") as f:
-            f.write(topology)
-
+        
+        safely_write(cassandra_yaml_file, contents)
+        safely_write(cassandra_topology_file, topology)
+        
         # Restart Cassandra and make sure it picks up the new list of seeds.
         _log.debug("Restarting Cassandra")
         run_command("monit unmonitor -g cassandra")
