@@ -66,7 +66,7 @@ def join_cassandra_cluster(cluster_view,
     if len(seeds_list) > 0:
         seeds_list_str = ','.join(map(str, seeds_list))
         _log.info("Cassandra seeds list is {}".format(seeds_list_str))
-    
+
         # Read cassandra.yaml.
         with open(cassandra_yaml_file) as f:
             doc = yaml.load(f)
@@ -76,7 +76,7 @@ def join_cassandra_cluster(cluster_view,
         doc["listen_address"] = ip
         doc["seed_provider"][0]["parameters"][0]["seeds"] = seeds_list_str
         doc["endpoint_snitch"] = "GossipingPropertyFileSnitch"
-       
+
         # Work out the timeout from the target_latency_us value (assuming
         # 100000 if it isn't set)
         get_latency_cmd = "target_latency_us=100000; . /etc/clearwater/config; echo -n $target_latency_us"
@@ -96,10 +96,10 @@ def join_cassandra_cluster(cluster_view,
         # Write back to cassandra.yaml.
         contents = WARNING_HEADER + "\n" + yaml.dump(doc)
         topology = WARNING_HEADER + "\n" + "dc={}\nrack=RAC1\n".format(site_name)
-        
+
         safely_write(cassandra_yaml_file, contents)
         safely_write(cassandra_topology_file, topology)
-        
+
         # Restart Cassandra and make sure it picks up the new list of seeds.
         _log.debug("Restarting Cassandra")
         run_command("monit unmonitor -g cassandra")
@@ -184,14 +184,12 @@ class CassandraPlugin(SynchroniserPluginBase):
             _log.debug("Adding schemas")
             run_command("/usr/share/clearwater/infrastructure/scripts/cassandra_schemas/run_cassandra_schemas")
 
-        _log.debug("Clearing Cassandra not-clustered alarm")
-        issue_alarm(alarm_constants.CASSANDRA_NOT_YET_CLUSTERED_CLEARED)
-
     def on_new_cluster_config_ready(self, cluster_view):
         pass
 
     def on_stable_cluster(self, cluster_view):
-        pass
+        _log.debug("Clearing Cassandra not-clustered alarm")
+        issue_alarm(alarm_constants.CASSANDRA_NOT_YET_CLUSTERED_CLEARED)
 
     def on_leaving_cluster(self, cluster_view):
         issue_alarm(alarm_constants.CASSANDRA_NOT_YET_DECOMMISSIONED_MAJOR)
