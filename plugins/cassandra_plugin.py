@@ -42,6 +42,7 @@ import time
 import yaml
 import os
 import subprocess
+import ipaddress
 
 _log = logging.getLogger("cassandra_plugin")
 
@@ -51,6 +52,7 @@ def join_cassandra_cluster(cluster_view,
                            ip,
                            site_name):
     seeds_list = []
+    ip_is_v6 = (ipaddress.ip_address(ip).version == 6)
 
     for seed, state in cluster_view.items():
         if (state == constants.NORMAL_ACKNOWLEDGED_CHANGE or
@@ -74,6 +76,18 @@ def join_cassandra_cluster(cluster_view,
         # Fill in the correct listen_address and seeds values in the yaml
         # document.
         doc["listen_address"] = ip
+
+        # Set the thrift listen address to the IPv4 or IPv6 loopback address
+        # as appropriate. Note we can't use 127.0.0.1 in both cases because in
+        # a pure IPv6 namespace clients will only try to connect to IPv6
+        # addresses.
+        if ip_is_v6:
+            rpc_address = '::1'
+        else:
+            rpc_address = '127.0.0.1'
+
+        doc['rpc_address'] = rpc_address
+
         doc["seed_provider"][0]["parameters"][0]["seeds"] = seeds_list_str
         doc["endpoint_snitch"] = "GossipingPropertyFileSnitch"
 
@@ -108,6 +122,17 @@ def join_cassandra_cluster(cluster_view,
         run_command("rm -rf /var/lib/cassandra/")
         run_command("mkdir -m 755 /var/lib/cassandra")
         run_command("chown -R cassandra /var/lib/cassandra")
+
+        # IF we're using IPv6 addresses we have to tell the JVM not to prefer
+        # IPv4 addresses (otherwise cassandra won't be able to start). This is
+        # controlled via the preferIPv4Stack option in cassandra-env.sh. If
+        # we're using IPv6 we comment this line out, otherwise we uncomment it
+        # back in.
+        prefer_ipv4_stack_regex = "JVM_OPTS[[:space:]]*=[[:space:]]*.*[.]preferIPv4Stack=true.*"
+        if ip_is_v6:
+            run_command("sed -i.bak 's/^\\(" + prefer_ipv4_stack_regex + "\\)$/#\\1/' /etc/cassandra/cassandra-env.sh")
+        else:
+            run_command("sed -i.bak 's/^\\#(" + prefer_ipv4_stack_regex + "\\)$/\\1/' /etc/cassandra/cassandra-env.sh")
 
         start_cassandra()
 
