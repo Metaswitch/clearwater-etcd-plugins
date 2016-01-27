@@ -58,10 +58,18 @@ class CassandraFailedPlugin(SynchroniserPluginBase):
         pass
 
     def on_leaving_cluster(self, cluster_view):
+
+        # Cassandra commands need to be run in the signaling network
+        # namespace in split network systems.
+        def in_namespace(command):
+            prefix = "/usr/share/clearwater/bin/run-in-signaling-namespace "
+            return prefix + command
+
         # We must remove the node from the cassandra cluster. Get the node's ID
         # from nodetool status, then remove it with nodetool remove
         try:
-            output = subprocess.check_output("nodetool status | grep " + self._ip,
+            status_command = "nodetool status | grep " + self._ip
+            output = subprocess.check_output(in_namespace(status_command),
                                              shell=True,
                                              stderr=subprocess.STDOUT)
             _log.debug("Nodetool status succeeded and printed output {!r}".
@@ -73,5 +81,5 @@ class CassandraFailedPlugin(SynchroniserPluginBase):
             # Pull the UUID from the output
             for value in output.split():
                 if "-" in value:
-                    run_command("nodetool removenode " + value)
+                    run_command(in_namespace("nodetool removenode " + value))
                     break
