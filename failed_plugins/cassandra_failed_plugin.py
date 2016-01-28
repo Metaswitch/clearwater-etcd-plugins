@@ -38,6 +38,11 @@ import logging
 _log = logging.getLogger("cassandra_failed_plugin")
 
 class CassandraFailedPlugin(SynchroniserPluginBase):
+
+    # This plugin has a different set of parameters to all of the
+    # other SynchroniserPluginBase subclasses.  This is currently
+    # necessary as mark_node_failed does not yet plumb through the
+    # information needed to run a normal plugin.
     def __init__(self, key, ip):
         self._key = key
         self._ip = ip
@@ -61,7 +66,13 @@ class CassandraFailedPlugin(SynchroniserPluginBase):
 
         # Cassandra commands need to be run in the signaling network
         # namespace in split network systems.
-        def in_namespace(command):
+        #
+        # This function means that there are now two ways of running a
+        # command in the signaling namespace - this function, and the
+        # namespace parameter to run_command.  This plugin does not have
+        # access to the signaling namespace name, so we use this function
+        # as a tactical workaround.
+        def in_sig_namespace(command):
             prefix = "/usr/share/clearwater/bin/run-in-signaling-namespace "
             return prefix + command
 
@@ -69,7 +80,7 @@ class CassandraFailedPlugin(SynchroniserPluginBase):
         # from nodetool status, then remove it with nodetool remove
         try:
             status_command = "nodetool status | grep " + self._ip
-            output = subprocess.check_output(in_namespace(status_command),
+            output = subprocess.check_output(in_sig_namespace(status_command),
                                              shell=True,
                                              stderr=subprocess.STDOUT)
             _log.debug("Nodetool status succeeded and printed output {!r}".
@@ -81,5 +92,6 @@ class CassandraFailedPlugin(SynchroniserPluginBase):
             # Pull the UUID from the output
             for value in output.split():
                 if "-" in value:
-                    run_command(in_namespace("nodetool removenode " + value))
+                    remove_command = "nodetool removenode " + value
+                    run_command(in_sig_namespace(remove_command))
                     break
