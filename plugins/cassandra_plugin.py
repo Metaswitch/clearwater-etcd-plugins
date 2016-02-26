@@ -34,7 +34,7 @@
 
 from metaswitch.clearwater.cluster_manager.plugin_base import SynchroniserPluginBase
 from metaswitch.clearwater.etcd_shared.plugin_utils import run_command, safely_write
-from metaswitch.clearwater.cluster_manager.alarms import issue_alarm
+from metaswitch.common.alarms import alarm_manager
 from metaswitch.clearwater.cluster_manager import pdlogs, alarm_constants, constants
 from metaswitch.clearwater.cluster_manager.plugin_utils import WARNING_HEADER
 import logging
@@ -186,7 +186,10 @@ class CassandraPlugin(SynchroniserPluginBase):
         self._sig_namespace = params.signaling_namespace
         self._key = "/{}/{}/clustering/cassandra".format(params.etcd_key, params.etcd_cluster_key)
         _log.debug("Raising Cassandra not-clustered alarm")
-        issue_alarm(alarm_constants.CASSANDRA_NOT_YET_CLUSTERED_MAJOR)
+        self._clustering_alarm = alarm_manager.get_alarm(
+            'cluster-manager',
+            alarm_constants.CASSANDRA_NOT_YET_CLUSTERED)
+        self._clustering_alarm.set()
         pdlogs.NOT_YET_CLUSTERED_ALARM.log(cluster_desc=self.cluster_description())
 
     def key(self):
@@ -214,12 +217,15 @@ class CassandraPlugin(SynchroniserPluginBase):
 
     def on_stable_cluster(self, cluster_view):
         _log.debug("Clearing Cassandra not-clustered alarm")
-        issue_alarm(alarm_constants.CASSANDRA_NOT_YET_CLUSTERED_CLEARED)
+        self._clustering_alarm.clear()
 
     def on_leaving_cluster(self, cluster_view):
-        issue_alarm(alarm_constants.CASSANDRA_NOT_YET_DECOMMISSIONED_MAJOR)
+        decommission_alarm = alarm_manager.get_alarm(
+            'cluster-manager',
+            alarm_constants.CASSANDRA_NOT_YET_DECOMMISSIONED)
+        decommission_alarm.set()
         leave_cassandra_cluster(self._sig_namespace)
-        issue_alarm(alarm_constants.CASSANDRA_NOT_YET_DECOMMISSIONED_CLEARED)
+        decommission_alarm.clear()
 
     def files(self):
         return ["/etc/cassandra/cassandra.yaml"]
