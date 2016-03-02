@@ -48,6 +48,7 @@ _log = logging.getLogger("cassandra_plugin")
 
 def join_cassandra_cluster(cluster_view,
                            cassandra_yaml_file,
+                           cassandra_yaml_template,
                            cassandra_topology_file,
                            ip,
                            site_name):
@@ -69,8 +70,8 @@ def join_cassandra_cluster(cluster_view,
         seeds_list_str = ','.join(map(str, seeds_list))
         _log.info("Cassandra seeds list is {}".format(seeds_list_str))
 
-        # Read cassandra.yaml.
-        with open(cassandra_yaml_file) as f:
+        # Read cassandra.yaml template.
+        with open(cassandra_yaml_template) as f:
             doc = yaml.load(f)
 
         # Fill in the correct listen_address and seeds values in the yaml
@@ -122,17 +123,6 @@ def join_cassandra_cluster(cluster_view,
         run_command("rm -rf /var/lib/cassandra/")
         run_command("mkdir -m 755 /var/lib/cassandra")
         run_command("chown -R cassandra /var/lib/cassandra")
-
-        # IF we're using IPv6 addresses we have to tell the JVM not to prefer
-        # IPv4 addresses (otherwise cassandra won't be able to start). This is
-        # controlled via the preferIPv4Stack option in cassandra-env.sh. If
-        # we're using IPv6 we comment this line out, otherwise we uncomment it
-        # back in.
-        prefer_ipv4_stack_regex = "JVM_OPTS[[:space:]]*=[[:space:]]*.*[.]preferIPv4Stack=true.*"
-        if ip_is_v6:
-            run_command("sed -i.bak 's/^\\(" + prefer_ipv4_stack_regex + "\\)$/#\\1/' /etc/cassandra/cassandra-env.sh")
-        else:
-            run_command("sed -i.bak 's/^\\#(" + prefer_ipv4_stack_regex + "\\)$/\\1/' /etc/cassandra/cassandra-env.sh")
 
         start_cassandra()
 
@@ -204,6 +194,7 @@ class CassandraPlugin(SynchroniserPluginBase):
     def on_joining_cluster(self, cluster_view):
         join_cassandra_cluster(cluster_view,
                                "/etc/cassandra/cassandra.yaml",
+                               "/usr/share/clearwater/cassandra/cassandra.yaml.template",
                                "/etc/cassandra/cassandra-rackdc.properties",
                                self._ip,
                                self._local_site)
