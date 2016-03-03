@@ -88,7 +88,7 @@ class CassandraPlugin(SynchroniserPluginBase):
 
     def on_stable_cluster(self, cluster_view):
         if os.path.exists("/etc/clearwater/force_cassandra_yaml_refresh"):
-            self.write_new_cassandra_config(self.get_seeds(cluster_view, self._ip))
+            self.write_new_cassandra_config(self.get_seeds(cluster_view))
 
         _log.debug("Clearing Cassandra not-clustered alarm")
         self._clustering_alarm.clear()
