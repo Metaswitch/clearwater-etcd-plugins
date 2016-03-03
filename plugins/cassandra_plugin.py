@@ -46,14 +46,79 @@ import ipaddress
 
 _log = logging.getLogger("cassandra_plugin")
 
-def join_cassandra_cluster(cluster_view,
-                           cassandra_yaml_file,
-                           cassandra_yaml_template,
-                           cassandra_topology_file,
-                           ip,
-                           site_name):
-    seeds_list = []
+
+def write_new_cassandra_config(cassandra_yaml_template,
+                               cassandra_yaml_file,
+                               cassandra_topology_file,
+                               ip,
+                               seeds_list,
+                               site_name,
+                               destructive_restart=False):
     ip_is_v6 = (ipaddress.ip_address(ip).version == 6)
+    seeds_list_str = ','.join(map(str, seeds_list))
+    _log.info("Cassandra seeds list is {}".format(seeds_list_str))
+
+    # Read cassandra.yaml template.
+    with open(cassandra_yaml_template) as f:
+        doc = yaml.load(f)
+
+    # Fill in the correct listen_address and seeds values in the yaml
+    # document.
+    doc["listen_address"] = ip
+
+    # Set the thrift listen address to the IPv4 or IPv6 loopback address
+    # as appropriate. Note we can't use 127.0.0.1 in both cases because in
+    # a pure IPv6 namespace clients will only try to connect to IPv6
+    # addresses.
+    if ip_is_v6:
+        rpc_address = '::1'
+    else:
+        rpc_address = '127.0.0.1'
+
+    doc['rpc_address'] = rpc_address
+
+    doc["seed_provider"][0]["parameters"][0]["seeds"] = seeds_list_str
+    doc["endpoint_snitch"] = "GossipingPropertyFileSnitch"
+
+    # Work out the timeout from the target_latency_us value (assuming
+    # 100000 if it isn't set)
+    get_latency_cmd = "target_latency_us=100000; . /etc/clearwater/config; echo -n $target_latency_us"
+    latency = subprocess.check_output(get_latency_cmd,
+                                      shell=True,
+                                      stderr=subprocess.STDOUT)
+
+    try:
+        # We want the timeout value to be 4/5ths the maximum acceptable time
+        # of a HTTP request (which is 5 * target latency)
+        timeout = (int(latency) / 1000) * 4
+    except ValueError:
+        timeout = 400
+
+    doc["read_request_timeout_in_ms"] = timeout
+
+    # Write back to cassandra.yaml.
+    contents = WARNING_HEADER + "\n" + yaml.dump(doc)
+    topology = WARNING_HEADER + "\n" + "dc={}\nrack=RAC1\n".format(site_name)
+
+    safely_write(cassandra_yaml_file, contents)
+    safely_write(cassandra_topology_file, topology)
+
+    # Restart Cassandra and make sure it picks up the new list of seeds.
+    _log.debug("Restarting Cassandra")
+    run_command("monit unmonitor -g cassandra")
+    run_command("service cassandra stop")
+    run_command("killall $(cat /var/lib/cassandra/cassandra.pid)", log_error=False)
+
+    if destructive_restart:
+        run_command("rm -rf /var/lib/cassandra/")
+        run_command("mkdir -m 755 /var/lib/cassandra")
+        run_command("chown -R cassandra /var/lib/cassandra")
+
+    start_cassandra()
+
+
+def get_seeds(cluster_view, ip):
+    seeds_list = []
 
     for seed, state in cluster_view.items():
         if (state == constants.NORMAL_ACKNOWLEDGED_CHANGE or
@@ -65,66 +130,25 @@ def join_cassandra_cluster(cluster_view,
             if (state == constants.JOINING_ACKNOWLEDGED_CHANGE or
                 state == constants.JOINING_CONFIG_CHANGED):
                 seeds_list.append(seed)
+    return seeds_list
 
+
+def join_cassandra_cluster(cluster_view,
+                           cassandra_yaml_file,
+                           cassandra_yaml_template,
+                           cassandra_topology_file,
+                           ip,
+                           site_name):
+
+    seeds_list = get_seeds(cluster_view, ip)
     if len(seeds_list) > 0:
-        seeds_list_str = ','.join(map(str, seeds_list))
-        _log.info("Cassandra seeds list is {}".format(seeds_list_str))
-
-        # Read cassandra.yaml template.
-        with open(cassandra_yaml_template) as f:
-            doc = yaml.load(f)
-
-        # Fill in the correct listen_address and seeds values in the yaml
-        # document.
-        doc["listen_address"] = ip
-
-        # Set the thrift listen address to the IPv4 or IPv6 loopback address
-        # as appropriate. Note we can't use 127.0.0.1 in both cases because in
-        # a pure IPv6 namespace clients will only try to connect to IPv6
-        # addresses.
-        if ip_is_v6:
-            rpc_address = '::1'
-        else:
-            rpc_address = '127.0.0.1'
-
-        doc['rpc_address'] = rpc_address
-
-        doc["seed_provider"][0]["parameters"][0]["seeds"] = seeds_list_str
-        doc["endpoint_snitch"] = "GossipingPropertyFileSnitch"
-
-        # Work out the timeout from the target_latency_us value (assuming
-        # 100000 if it isn't set)
-        get_latency_cmd = "target_latency_us=100000; . /etc/clearwater/config; echo -n $target_latency_us"
-        latency = subprocess.check_output(get_latency_cmd,
-                                          shell=True,
-                                          stderr=subprocess.STDOUT)
-
-        try:
-            # We want the timeout value to be 4/5ths the maximum acceptable time
-            # of a HTTP request (which is 5 * target latency)
-            timeout = (int(latency) / 1000 ) * 4
-        except ValueError:
-            timeout = 400
-
-        doc["read_request_timeout_in_ms"] = timeout
-
-        # Write back to cassandra.yaml.
-        contents = WARNING_HEADER + "\n" + yaml.dump(doc)
-        topology = WARNING_HEADER + "\n" + "dc={}\nrack=RAC1\n".format(site_name)
-
-        safely_write(cassandra_yaml_file, contents)
-        safely_write(cassandra_topology_file, topology)
-
-        # Restart Cassandra and make sure it picks up the new list of seeds.
-        _log.debug("Restarting Cassandra")
-        run_command("monit unmonitor -g cassandra")
-        run_command("service cassandra stop")
-        run_command("killall $(cat /var/lib/cassandra/cassandra.pid)", log_error=False)
-        run_command("rm -rf /var/lib/cassandra/")
-        run_command("mkdir -m 755 /var/lib/cassandra")
-        run_command("chown -R cassandra /var/lib/cassandra")
-
-        start_cassandra()
+        write_new_cassandra_config(cassandra_yaml_template,
+                                   cassandra_yaml_file,
+                                   cassandra_topology_file,
+                                   ip,
+                                   seeds_list,
+                                   site_name,
+                                   destructive_restart=True)
 
         _log.debug("Cassandra node successfully clustered")
 
@@ -134,6 +158,7 @@ def join_cassandra_cluster(cluster_view,
         _log.warning("No Cassandra cluster defined in etcd - unable to join")
         pass
 
+
 def can_contact_cassandra():
     if os.path.exists("/var/run/cassandra/cassandra.pid"):
         rc = run_command("/usr/share/clearwater/bin/poll_cassandra.sh --no-grace-period")
@@ -141,6 +166,7 @@ def can_contact_cassandra():
     else:
         # Cassandra isn't even running, let alone contactable
         return False
+
 
 def leave_cassandra_cluster(namespace=None):
     # We need Cassandra to be running so that we can connect on port 9160 and
@@ -168,6 +194,7 @@ def start_cassandra():
 
         # Sleep so we don't tight loop
         time.sleep(1)
+
 
 class CassandraPlugin(SynchroniserPluginBase):
     def __init__(self, params):
@@ -207,6 +234,15 @@ class CassandraPlugin(SynchroniserPluginBase):
         pass
 
     def on_stable_cluster(self, cluster_view):
+        if os.path.exists("/etc/clearwater/force_cassandra_yaml_refresh"):
+            write_new_cassandra_config("/usr/share/clearwater/cassandra/cassandra.yaml.template",
+                                       "/etc/cassandra/cassandra.yaml",
+                                       "/etc/cassandra/cassandra-rackdc.properties",
+                                       self._ip,
+                                       get_seeds(cluster_view, self._ip),
+                                       self._local_site)
+            os.remove("/etc/clearwater/force_cassandra_yaml_refresh")
+
         _log.debug("Clearing Cassandra not-clustered alarm")
         self._clustering_alarm.clear()
 
