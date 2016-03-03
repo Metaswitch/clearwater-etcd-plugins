@@ -49,9 +49,9 @@ _log = logging.getLogger("cassandra_plugin")
 
 class CassandraPlugin(SynchroniserPluginBase):
 
-    cassandra_yaml_template = "/usr/share/clearwater/cassandra/cassandra.yaml.template"
-    cassandra_yaml_file = "/etc/cassandra/cassandra.yaml"
-    cassandra_topology_file = "/etc/cassandra/cassandra-rackdc.properties"
+    CASSANDRA_YAML_TEMPLATE = "/usr/share/clearwater/cassandra/cassandra.yaml.template"
+    CASSANDRA_YAML_FILE = "/etc/cassandra/cassandra.yaml"
+    CASSANDRA_TOPOLOGY_FILE = "/etc/cassandra/cassandra-rackdc.properties"
 
     def __init__(self, params):
         self._ip = params.ip
@@ -73,6 +73,12 @@ class CassandraPlugin(SynchroniserPluginBase):
     def cluster_description(self):
         return "Cassandra cluster"
 
+    def on_startup(self, cluster_view):
+        if os.path.exists("/etc/clearwater/force_cassandra_yaml_refresh"):
+            seeds = self.get_seeds(cluster_view)
+            if seeds:
+                self.write_new_cassandra_config(seeds)
+
     def on_cluster_changing(self, cluster_view):
         pass
 
@@ -87,9 +93,6 @@ class CassandraPlugin(SynchroniserPluginBase):
         pass
 
     def on_stable_cluster(self, cluster_view):
-        if os.path.exists("/etc/clearwater/force_cassandra_yaml_refresh"):
-            self.write_new_cassandra_config(self.get_seeds(cluster_view))
-
         _log.debug("Clearing Cassandra not-clustered alarm")
         self._clustering_alarm.clear()
 
@@ -112,7 +115,7 @@ class CassandraPlugin(SynchroniserPluginBase):
         _log.info("Cassandra seeds list is {}".format(seeds_list_str))
 
         # Read cassandra.yaml template.
-        with open(self.cassandra_yaml_template) as f:
+        with open(self.CASSANDRA_YAML_TEMPLATE) as f:
             doc = yaml.load(f)
 
         # Fill in the correct listen_address and seeds values in the yaml
@@ -153,8 +156,8 @@ class CassandraPlugin(SynchroniserPluginBase):
         contents = WARNING_HEADER + "\n" + yaml.dump(doc)
         topology = WARNING_HEADER + "\n" + "dc={}\nrack=RAC1\n".format(self._local_site)
 
-        safely_write(self.cassandra_yaml_file, contents)
-        safely_write(self.cassandra_topology_file, topology)
+        safely_write(self.CASSANDRA_YAML_FILE, contents)
+        safely_write(self.CASSANDRA_TOPOLOGY_FILE, topology)
 
         # Restart Cassandra and make sure it picks up the new list of seeds.
         _log.debug("Restarting Cassandra")
@@ -232,6 +235,10 @@ class CassandraPlugin(SynchroniserPluginBase):
 
             # Sleep so we don't tight loop
             time.sleep(1)
+
+        # Restart clearwater-infrastructure so any necessary schema creation
+        # scripts get run
+        run_command("sudo service clearwater-infrastructure restart")
 
 
 def load_as_plugin(params):
