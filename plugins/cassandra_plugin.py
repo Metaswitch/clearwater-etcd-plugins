@@ -185,11 +185,9 @@ class CassandraPlugin(SynchroniserPluginBase):
         self._local_site = params.local_site
         self._sig_namespace = params.signaling_namespace
         self._key = "/{}/{}/clustering/cassandra".format(params.etcd_key, params.etcd_cluster_key)
-        _log.debug("Raising Cassandra not-clustered alarm")
         self._clustering_alarm = alarm_manager.get_alarm(
             'cluster-manager',
             alarm_constants.CASSANDRA_NOT_YET_CLUSTERED)
-        self._clustering_alarm.set()
         pdlogs.NOT_YET_CLUSTERED_ALARM.log(cluster_desc=self.cluster_description())
 
     def key(self):
@@ -199,9 +197,13 @@ class CassandraPlugin(SynchroniserPluginBase):
         return "Cassandra cluster"
 
     def on_cluster_changing(self, cluster_view):
+        _log.debug("Raising Cassandra not-clustered alarm")
+        self._clustering_alarm.set()
         pass
 
     def on_joining_cluster(self, cluster_view):
+        _log.debug("Raising Cassandra not-clustered alarm")
+        self._clustering_alarm.set()
         join_cassandra_cluster(cluster_view,
                                "/etc/cassandra/cassandra.yaml",
                                "/etc/cassandra/cassandra-rackdc.properties",
@@ -213,6 +215,8 @@ class CassandraPlugin(SynchroniserPluginBase):
             run_command("/usr/share/clearwater/infrastructure/scripts/cassandra_schemas/run_cassandra_schemas")
 
     def on_new_cluster_config_ready(self, cluster_view):
+        _log.debug("Raising Cassandra not-clustered alarm")
+        self._clustering_alarm.set()
         pass
 
     def on_stable_cluster(self, cluster_view):
