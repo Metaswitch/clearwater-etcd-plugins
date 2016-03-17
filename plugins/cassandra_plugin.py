@@ -58,11 +58,9 @@ class CassandraPlugin(SynchroniserPluginBase):
         self._local_site = params.local_site
         self._sig_namespace = params.signaling_namespace
         self._key = "/{}/{}/clustering/cassandra".format(params.etcd_key, params.etcd_cluster_key)
-        _log.debug("Raising Cassandra not-clustered alarm")
         self._clustering_alarm = alarm_manager.get_alarm(
             'cluster-manager',
             alarm_constants.CASSANDRA_NOT_YET_CLUSTERED)
-        self._clustering_alarm.set()
         pdlogs.NOT_YET_CLUSTERED_ALARM.log(cluster_desc=self.cluster_description())
 
     # Interface-defined plugin functions
@@ -80,9 +78,12 @@ class CassandraPlugin(SynchroniserPluginBase):
                 self.write_new_cassandra_config(seeds)
 
     def on_cluster_changing(self, cluster_view):
-        pass
+        _log.debug("Raising Cassandra not-clustered alarm")
+        self._clustering_alarm.set()
 
     def on_joining_cluster(self, cluster_view):
+        _log.debug("Raising Cassandra not-clustered alarm")
+        self._clustering_alarm.set()
         self.join_cassandra_cluster(cluster_view)
 
         if (self._ip == sorted(cluster_view.keys())[0]):
@@ -90,7 +91,8 @@ class CassandraPlugin(SynchroniserPluginBase):
             run_command("/usr/share/clearwater/infrastructure/scripts/cassandra_schemas/run_cassandra_schemas")
 
     def on_new_cluster_config_ready(self, cluster_view):
-        pass
+        _log.debug("Raising Cassandra not-clustered alarm")
+        self._clustering_alarm.set()
 
     def on_stable_cluster(self, cluster_view):
         _log.debug("Clearing Cassandra not-clustered alarm")
@@ -195,7 +197,6 @@ class CassandraPlugin(SynchroniserPluginBase):
                                             destructive_restart=True)
 
             _log.debug("Cassandra node successfully clustered")
-
         else:
             # Something has gone wrong - the local node should be WAITING_TO_JOIN in
             # etcd (at the very least).
