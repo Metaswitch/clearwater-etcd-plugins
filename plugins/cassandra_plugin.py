@@ -180,7 +180,8 @@ class CassandraPlugin(SynchroniserPluginBase):
 
         for seed, state in cluster_view.items():
             if (state == constants.NORMAL_ACKNOWLEDGED_CHANGE or
-                state == constants.NORMAL_CONFIG_CHANGED):
+                state == constants.NORMAL_CONFIG_CHANGED or
+                state == constants.NORMAL):
                 seeds_list.append(seed)
 
         if len(seeds_list) == 0:
