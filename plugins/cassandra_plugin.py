@@ -56,6 +56,7 @@ class CassandraPlugin(SynchroniserPluginBase):
     def __init__(self, params):
         self._ip = params.ip
         self._local_site = params.local_site
+        self._remote_seeds = params.remote_cassandra_seeds
         self._sig_namespace = params.signaling_namespace
         self._key = "/{}/{}/clustering/cassandra".format(params.etcd_key, params.etcd_cluster_key)
         self._clustering_alarm = alarm_manager.get_alarm(
@@ -189,6 +190,7 @@ class CassandraPlugin(SynchroniserPluginBase):
                 if (state == constants.JOINING_ACKNOWLEDGED_CHANGE or
                     state == constants.JOINING_CONFIG_CHANGED):
                     seeds_list.append(seed)
+            seeds_list = seeds_list + self._remote_seeds
         return seeds_list
 
     def join_cassandra_cluster(self, cluster_view):
