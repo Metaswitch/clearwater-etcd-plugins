@@ -165,7 +165,7 @@ class CassandraPlugin(SynchroniserPluginBase):
         _log.debug("Restarting Cassandra")
         run_command("monit unmonitor -g cassandra")
         run_command("service cassandra stop")
-        run_command("killall $(cat /var/lib/cassandra/cassandra.pid)", log_error=False)
+        run_command("killall $(cat /var/run/cassandra/cassandra.pid)", log_error=False)
 
         if destructive_restart:
             run_command("rm -rf /var/lib/cassandra/")
@@ -173,7 +173,9 @@ class CassandraPlugin(SynchroniserPluginBase):
             run_command("chown -R cassandra /var/lib/cassandra")
 
         self.start_cassandra()
-        os.remove("/etc/clearwater/force_cassandra_yaml_refresh")
+
+        if os.path.exists("/etc/clearwater/force_cassandra_yaml_refresh"):
+            os.remove("/etc/clearwater/force_cassandra_yaml_refresh")
 
     def get_seeds(self, cluster_view):
         seeds_list = []
