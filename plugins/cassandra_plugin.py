@@ -163,7 +163,8 @@ class CassandraPlugin(SynchroniserPluginBase):
         # Remove the cassandra.yaml file first - Cassandra won't start up while
         # it's missing, so this keeps it stopped while we're clearing out its
         # database
-        os.remove(self.CASSANDRA_YAML_FILE)
+        if os.path.exists(self.CASSANDRA_YAML_FILE):
+            os.remove(self.CASSANDRA_YAML_FILE)
         
         _log.debug("Restarting Cassandra")
 
@@ -233,7 +234,8 @@ class CassandraPlugin(SynchroniserPluginBase):
         # Remove the cassandra.yaml file first - Cassandra won't start up while
         # it's missing, so this prevents monit or supervisord from
         # auto-restarting it after decommissioning.
-        os.remove(self.CASSANDRA_YAML_FILE)
+        if os.path.exists(self.CASSANDRA_YAML_FILE):
+            os.remove(self.CASSANDRA_YAML_FILE)
  
         run_command("nodetool decommission", self._sig_namespace)
 
