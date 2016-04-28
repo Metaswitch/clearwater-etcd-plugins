@@ -218,12 +218,8 @@ class CassandraPlugin(SynchroniserPluginBase):
             pass
 
     def can_contact_cassandra(self):
-        if os.path.exists("/var/run/cassandra/cassandra.pid"):
-            rc = run_command("/usr/share/clearwater/bin/poll_cassandra.sh --no-grace-period")
-            return (rc == 0)
-        else:
-            # Cassandra isn't even running, let alone contactable
-            return False
+        rc = run_command("/usr/share/clearwater/bin/poll_cassandra.sh --no-grace-period", log_error=False)
+        return (rc == 0)
 
     def leave_cassandra_cluster(self):
         # We need Cassandra to be running so that we can connect on port 9160 and
@@ -244,11 +240,17 @@ class CassandraPlugin(SynchroniserPluginBase):
         # - this avoids race conditions where both we and monit start it at the
         # same time and two copies start up.
 
+        _log.info("Waiting for Cassandra to come up...")
         # Wait until we can connect on port 9160 - i.e. Cassandra is running.
+        attempts = 0;
         while not self.can_contact_cassandra():
             # Sleep so we don't tight loop
             time.sleep(1)
+            attempts += 1
+            if ((attempts % 10) == 0):
+                _log.info("Still waiting for Cassandra to come up...")
 
+        _log.info("Finished waiting for Cassandra to come up")
         # Restart clearwater-infrastructure so any necessary schema creation
         # scripts get run
         run_command("sudo service clearwater-infrastructure restart")
