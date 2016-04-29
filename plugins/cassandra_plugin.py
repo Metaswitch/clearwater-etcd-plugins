@@ -159,6 +159,7 @@ class CassandraPlugin(SynchroniserPluginBase):
         topology = WARNING_HEADER + "\n" + "dc={}\nrack=RAC1\n".format(self._local_site)
 
         # Restart Cassandra and make sure it picks up the new list of seeds.
+        _log.info("Restarting Cassandra")
 
         # Remove the cassandra.yaml file first - Cassandra won't start up while
         # it's missing, so this keeps it stopped while we're clearing out its
@@ -166,12 +167,15 @@ class CassandraPlugin(SynchroniserPluginBase):
         if os.path.exists(self.CASSANDRA_YAML_FILE):
             os.remove(self.CASSANDRA_YAML_FILE)
         
-        _log.debug("Restarting Cassandra")
-
-        # Invoke the init.d script directly - this should mean that
-        # supervisord keeps restarting Cassandra when running in Docker
-        run_command("/etc/init.d/cassandra stop")
-        run_command("killall $(cat /var/run/cassandra/cassandra.pid)", log_error=False)
+        # Stop Cassandra directly rather than going through any 'service'
+        # commands - this should mean that supervisord keeps restarting
+        # Cassandra when running in Docker.
+        #
+        # Note that we can't use the init.d script here, because cassandra.yaml
+        # doesn't exist so it immediately exits.
+        run_command("start-stop-daemon -K -p /var/run/cassandra/cassandra.pid -R TERM/30/KILL/5")
+        
+        _log.info("Stopped Cassandra while changing config files")
 
         if destructive_restart:
             _log.warn("Deleting /var/lib/cassandra - this is normal on initial clustering")
