@@ -126,13 +126,13 @@ class CassandraPlugin(SynchroniserPluginBase):
         doc["listen_address"] = self._ip
 
         # Set the thrift listen address to the IPv4 or IPv6 loopback address
-        # as appropriate. Note we can't use 127.0.0.1 in both cases because in
+        # as appropriate. Note we can't use 0.0.0.0 in both cases because in
         # a pure IPv6 namespace clients will only try to connect to IPv6
-        # addresses.
+        # addresses. Ideally, we'd listen on both addresses.
         if ip_is_v6:
-            rpc_address = '::1'
+            rpc_address = '::0'
         else:
-            rpc_address = '127.0.0.1'
+            rpc_address = '0.0.0.0'
 
         doc['rpc_address'] = rpc_address
 
