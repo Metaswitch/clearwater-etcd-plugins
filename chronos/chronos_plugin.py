@@ -86,7 +86,7 @@ class ChronosPlugin(SynchroniserPluginBase):
         # UUID.
         self.instance_id = ord(uuid_bytes[0]) & 0b0111111
         self.deployment_id = ord(uuid_bytes[1]) & 0b00000111
-        if self.instance_id > 127 or self.deployment_id > 7:
+        if self.instance_id > 127 or self.deployment_id > 7:  # pragma: no cover
             _log.error("instance_id/deployment_id are out of expected range - %d and %d (max should be 127 and 7)", self.instance_id, self.deployment_id)
         self._key = "/{}/{}/{}/clustering/chronos".format(params.etcd_key, params.local_site, params.etcd_cluster_key)
         self._alarm = alarm_manager.get_alarm(
@@ -94,33 +94,33 @@ class ChronosPlugin(SynchroniserPluginBase):
             alarm_constants.CHRONOS_NOT_YET_CLUSTERED)
         pdlogs.NOT_YET_CLUSTERED_ALARM.log(cluster_desc=self.cluster_description())
 
-    def key(self):
+    def key(self): # pragma: no cover
         return self._key
 
-    def files(self):
+    def files(self): # pragma: no cover
         return ["/etc/chronos/chronos_cluster.conf"]
 
     def cluster_description(self):
         return "local Chronos cluster"
 
-    def on_cluster_changing(self, cluster_view):
+    def on_cluster_changing(self, cluster_view): # pragma: no cover
         self._alarm.set()
         self.write_cluster_settings(cluster_view)
 
-    def on_joining_cluster(self, cluster_view):
+    def on_joining_cluster(self, cluster_view): # pragma: no cover
         self._alarm.set()
         self.write_cluster_settings(cluster_view)
 
-    def on_new_cluster_config_ready(self, cluster_view):
+    def on_new_cluster_config_ready(self, cluster_view): # pragma: no cover
         self._alarm.set()
         run_command("service chronos resync")
         run_command("service chronos wait-sync")
 
-    def on_stable_cluster(self, cluster_view):
+    def on_stable_cluster(self, cluster_view): # pragma: no cover
         self.write_cluster_settings(cluster_view)
         self._alarm.clear()
 
-    def on_leaving_cluster(self, cluster_view):
+    def on_leaving_cluster(self, cluster_view): # pragma: no cover
         pass
 
     def write_cluster_settings(self, cluster_view):
@@ -131,6 +131,6 @@ class ChronosPlugin(SynchroniserPluginBase):
                                        self.deployment_id)
         run_command("service chronos reload")
 
-def load_as_plugin(params):
+def load_as_plugin(params): # pragma: no cover
     _log.info("Loading the Chronos plugin")
     return ChronosPlugin(params)
