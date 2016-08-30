@@ -113,7 +113,6 @@ class CassandraPlugin(SynchroniserPluginBase):
     # Specific methods for handling Cassandra
 
     def write_new_cassandra_config(self, seeds_list, destructive_restart=False):
-        ip_is_v6 = (ipaddress.ip_address(self._ip).version == 6)
         seeds_list_str = ','.join(map(str, seeds_list))
         _log.info("Cassandra seeds list is {}".format(seeds_list_str))
 
@@ -124,17 +123,6 @@ class CassandraPlugin(SynchroniserPluginBase):
         # Fill in the correct listen_address and seeds values in the yaml
         # document.
         doc["listen_address"] = self._ip
-
-        # Set the thrift listen address to the IPv4 or IPv6 loopback address
-        # as appropriate. Note we can't use 0.0.0.0 in both cases because in
-        # a pure IPv6 namespace clients will only try to connect to IPv6
-        # addresses. Ideally, we'd listen on both addresses.
-        if ip_is_v6:
-            rpc_address = '::0'
-        else:
-            rpc_address = '0.0.0.0'
-
-        doc['rpc_address'] = rpc_address
 
         doc["seed_provider"][0]["parameters"][0]["seeds"] = seeds_list_str
         doc["endpoint_snitch"] = "GossipingPropertyFileSnitch"
