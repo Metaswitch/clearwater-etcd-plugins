@@ -38,8 +38,8 @@ import os
 _log = logging.getLogger("apply_config_plugin")
 
 class ApplyConfigPlugin(QueuePluginBase):
-    def __init__(self, _params):
-        pass
+    def __init__(self, params):
+        self._ignore_plugin_responses = params.ignore_plugin_responses
 
     def key(self):
         return "apply_config"
@@ -53,12 +53,16 @@ class ApplyConfigPlugin(QueuePluginBase):
             for restart_script in os.listdir("/usr/share/clearwater/infrastructure/scripts/restart"):
                 run_command("/usr/share/clearwater/infrastructure/scripts/restart/" + restart_script)
  
-        _log.info("Checking service health")
-        if run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/check_node_health.py"):
-            _log.info("Services failed to restart successfully")
-            run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue remove_failure apply_config")
+        if self._ignore_plugin_responses == "Y":
+            _log.info("Checking service health")
+            if run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/check_node_health.py"):
+                _log.info("Services failed to restart successfully")
+                run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue remove_failure apply_config")
+            else:
+                _log.info("Services restarted successfully")
+                run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue remove_success apply_config")
         else:
-            _log.info("Services restarted successfully")
+            _log.info("Not checking service health")
             run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue remove_success apply_config")
 
 def load_as_plugin(params):
