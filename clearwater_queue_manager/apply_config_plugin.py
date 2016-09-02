@@ -53,7 +53,7 @@ class ApplyConfigPlugin(QueuePluginBase):
             for restart_script in os.listdir("/usr/share/clearwater/infrastructure/scripts/restart"):
                 run_command("/usr/share/clearwater/infrastructure/scripts/restart/" + restart_script)
  
-        if self._ignore_plugin_responses == "Y":
+        if self._ignore_plugin_responses != "Y":
             _log.info("Checking service health")
             if run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/check_node_health.py"):
                 _log.info("Services failed to restart successfully")
