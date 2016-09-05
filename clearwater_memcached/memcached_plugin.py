@@ -51,33 +51,33 @@ class MemcachedPlugin(SynchroniserPluginBase):
             alarm_constants.MEMCACHED_NOT_YET_CLUSTERED)
         self._key = "/{}/{}/{}/clustering/memcached".format(params.etcd_key, params.local_site, params.etcd_cluster_key)
 
-    def key(self):
+    def key(self):  # pragma: no cover
         return self._key
 
-    def files(self):
+    def files(self):  # pragma: no cover
         return ["/etc/clearwater/cluster_settings"]
 
-    def cluster_description(self):
+    def cluster_description(self):  # pragma: no cover
         return "local Memcached cluster"
 
-    def on_cluster_changing(self, cluster_view):
+    def on_cluster_changing(self, cluster_view):  # pragma: no cover
         self._alarm.set()
         self.write_cluster_settings(cluster_view)
 
-    def on_joining_cluster(self, cluster_view):
+    def on_joining_cluster(self, cluster_view):  # pragma: no cover
         self._alarm.set()
         self.write_cluster_settings(cluster_view)
 
-    def on_new_cluster_config_ready(self, cluster_view):
+    def on_new_cluster_config_ready(self, cluster_view):  # pragma: no cover
         self._alarm.set()
         run_command("service astaire reload")
         run_command("service astaire wait-sync")
 
-    def on_stable_cluster(self, cluster_view):
+    def on_stable_cluster(self, cluster_view):  # pragma: no cover
         self.write_cluster_settings(cluster_view)
         self._alarm.clear()
 
-    def on_leaving_cluster(self, cluster_view):
+    def on_leaving_cluster(self, cluster_view):  # pragma: no cover
         pass
 
     def write_cluster_settings(self, cluster_view):
@@ -85,6 +85,6 @@ class MemcachedPlugin(SynchroniserPluginBase):
                                          cluster_view)
         run_command("/usr/share/clearwater/bin/reload_memcached_users")
 
-def load_as_plugin(params):
+def load_as_plugin(params):  # pragma: no cover
     _log.info("Loading the Memcached plugin")
     return MemcachedPlugin(params)
