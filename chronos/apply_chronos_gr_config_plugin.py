@@ -35,7 +35,7 @@ from metaswitch.clearwater.etcd_shared.plugin_utils import run_command
 import logging
 import os
 
-_log = logging.getLogger("apply_config_plugin")
+_log = logging.getLogger("apply_chronos_gr_config_plugin")
 
 class ApplyChronosGRConfigPlugin(QueuePluginBase):
     def __init__(self, _params):
