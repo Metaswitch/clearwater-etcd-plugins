@@ -32,6 +32,7 @@
 
 from metaswitch.clearwater.queue_manager.plugin_base import QueuePluginBase
 from metaswitch.clearwater.etcd_shared.plugin_utils import run_command
+import metaswitch.clearwater.queue_manager.alarm_constants
 import logging
 import os
 
