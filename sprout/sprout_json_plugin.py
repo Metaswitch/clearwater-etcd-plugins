@@ -47,17 +47,6 @@ class SproutJsonPlugin(ConfigPluginBase):
     def file(self):
         return self._file
 
-    def status(self, value):
-        try:
-            with open(self._file, "r") as ifile:
-                current = ifile.read()
-                if current == value:
-                    return FileStatus.UP_TO_DATE
-                else:
-                    return FileStatus.OUT_OF_SYNC
-        except IOError:
-            return FileStatus.MISSING
-
     def on_config_changed(self, value, alarm):
         _log.info("Updating {}".format(self._file))
 

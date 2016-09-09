@@ -60,9 +60,14 @@ class ApplyChronosGRConfigPlugin(QueuePluginBase):
 
     def at_front_of_queue(self):
         _log.info("Restarting Chronos")
-        run_command("service chronos stop")
-        run_command("service chronos wait-sync")
-        run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue remove_success apply_chronos_gr_config")
+        if run_command("service chronos stop"):
+            _log.warning("Unable to stop Chronos successfully")
+        if run_command("service chronos wait-sync"):
+            _log.warning("Unable to resync Chronos successfully")
+        if run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue remove_success apply_chronos_gr_config"):
+            _log.warning("Unable to remove this node from the resync queue")
+        _log.info("Chronos restarted")
+
 
 def load_as_plugin(params): # pragma: no cover
     return ApplyChronosGRConfigPlugin(params)

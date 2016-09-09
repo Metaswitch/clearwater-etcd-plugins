@@ -62,10 +62,10 @@ if [ $rc != 0 ] ; then
   echo Upload chronos GR configuration failed to $keypath  >&2
   cat /tmp/upload-chronos-gr-config.stderr.$$              >&2
   cat /tmp/upload-chronos-gr-config.stdout.$$              >&2
+else
+  # Add this node to the list of nodes to restart
+  /usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue add apply_chronos_gr_config
 fi
 rm -f /tmp/upload-chronos-gr-config.stderr.$$ /tmp/upload-chronos-gr-config.stdout.$$
-
-# Add this node to the list of nodes to restart
-/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue add apply_chronos_gr_config
 
 exit $rc

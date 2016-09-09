@@ -43,4 +43,8 @@ then
   exit 1
 fi
 
-/usr/share/clearwater/clearwater-queue-manager/env/bin/python /usr/share/clearwater/clearwater-queue-manager/scripts/force_queue_state.py "${management_local_ip:-$local_ip}" "$local_site_name" "apply_chronos_gr_config"
+/usr/share/clearwater/clearwater-queue-manager/env/bin/python \
+  /usr/share/clearwater/clearwater-queue-manager/scripts/force_queue_state.py \
+    "${management_local_ip:-$local_ip}" \
+    "$local_site_name" \
+    "apply_chronos_gr_config"
