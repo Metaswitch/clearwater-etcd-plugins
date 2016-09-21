@@ -50,6 +50,17 @@ class SharedConfigPlugin(ConfigPluginBase):
     def file(self):
         return _file
 
+    def status(self, value):
+        try:
+            with open(_file, "r") as ifile:
+                current = ifile.read()
+                if current == value:  # pragma: no cover
+                    return FileStatus.UP_TO_DATE
+                else:
+                    return FileStatus.OUT_OF_SYNC
+        except IOError:  # pragma: no cover
+            return FileStatus.MISSING
+
     def on_config_changed(self, value, alarm):
         _log.info("Updating shared configuration file")
 

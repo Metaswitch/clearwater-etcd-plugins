@@ -32,7 +32,6 @@
 
 from metaswitch.clearwater.queue_manager.plugin_base import QueuePluginBase
 from metaswitch.clearwater.etcd_shared.plugin_utils import run_command
-import metaswitch.clearwater.queue_manager.alarm_constants
 import logging
 import os
 
@@ -48,11 +47,11 @@ class ApplyChronosGRConfigPlugin(QueuePluginBase):
     WAIT_FOR_OTHER_NODE = 600
 
     def local_alarm(self): # pragma: no cover
-        return (alarm_constants.LOCAL_CHRONOS_GR_CONFIG_RESYNCHING,
+        return ((9004, 1, 5, 3),
                 "local")
 
     def global_alarm(self): # pragma: no cover
-        return (alarm_constants.GLOBAL_CHRONOS_GR_CONFIG_RESYNCHING,
+        return ((9003, 1, 5, 3),
                 "global")
 
     def key(self): # pragma: no cover
