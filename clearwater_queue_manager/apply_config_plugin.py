@@ -41,7 +41,7 @@ class ApplyConfigPlugin(QueuePluginBase):
     def __init__(self, _params):
         pass
 
-    def key(self):
+    def key(self):  # pragma: no cover
         return "apply_config"
 
     def at_front_of_queue(self):
@@ -61,5 +61,5 @@ class ApplyConfigPlugin(QueuePluginBase):
             _log.info("Services restarted successfully")
             run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue remove_success apply_config")
 
-def load_as_plugin(params):
+def load_as_plugin(params):  # pragma: no cover
     return ApplyConfigPlugin(params)

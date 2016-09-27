@@ -45,34 +45,34 @@ class RemoteMemcachedPlugin(SynchroniserPluginBase):
         self._key = "/{}/{}/{}/clustering/memcached".format(params.etcd_key, params.remote_site, params.etcd_cluster_key)
         self._remote_site = params.remote_site
 
-    def key(self):
+    def key(self):  # pragma: no cover
         return self._key
 
-    def should_be_in_cluster(self):
+    def should_be_in_cluster(self):  # pragma: no cover
         return False
 
-    def files(self):
+    def files(self):  # pragma: no cover
         return ["/etc/clearwater/remote_cluster_settings"]
 
-    def cluster_description(self):
+    def cluster_description(self):  # pragma: no cover
         return "remote Memcached cluster"
 
-    def on_cluster_changing(self, cluster_view):
+    def on_cluster_changing(self, cluster_view):  # pragma: no cover
         self.write_cluster_settings(cluster_view)
 
-    def on_joining_cluster(self, cluster_view):
+    def on_joining_cluster(self, cluster_view):  # pragma: no cover
         # We should never join the remote cluster, because it's the *remote*
         # cluster
         pass
 
-    def on_new_cluster_config_ready(self, cluster_view):
+    def on_new_cluster_config_ready(self, cluster_view):  # pragma: no cover
         # No Astaire resync needed - the remote site handles that
         pass
 
-    def on_stable_cluster(self, cluster_view):
+    def on_stable_cluster(self, cluster_view):  # pragma: no cover
         self.write_cluster_settings(cluster_view)
 
-    def on_leaving_cluster(self, cluster_view):
+    def on_leaving_cluster(self, cluster_view):  # pragma: no cover
         # We should never leave the remote cluster, because it's the *remote*
         # cluster
         pass
@@ -84,7 +84,7 @@ class RemoteMemcachedPlugin(SynchroniserPluginBase):
             run_command("/usr/share/clearwater/bin/reload_memcached_users")
 
 
-def load_as_plugin(params):
+def load_as_plugin(params):  # pragma: no cover
     if not params.remote_site == "":
         _log.info("Loading the remote Memcached plugin")
         return RemoteMemcachedPlugin(params)
