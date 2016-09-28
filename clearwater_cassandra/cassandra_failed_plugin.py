@@ -47,19 +47,19 @@ class CassandraFailedPlugin(SynchroniserPluginBase):
         self._key = key
         self._ip = ip
 
-    def key(self):
+    def key(self):  # pragma: no coverage
         return self._key
 
-    def on_cluster_changing(self, cluster_view):
+    def on_cluster_changing(self, cluster_view):  # pragma: no coverage
         pass
 
-    def on_joining_cluster(self, cluster_view):
+    def on_joining_cluster(self, cluster_view):  # pragma: no coverage
         pass
 
-    def on_new_cluster_config_ready(self, cluster_view):
+    def on_new_cluster_config_ready(self, cluster_view):  # pragma: no coverage
         pass
 
-    def on_stable_cluster(self, cluster_view):
+    def on_stable_cluster(self, cluster_view):  # pragma: no coverage
         pass
 
     def on_leaving_cluster(self, cluster_view):
@@ -85,7 +85,7 @@ class CassandraFailedPlugin(SynchroniserPluginBase):
                                              stderr=subprocess.STDOUT)
             _log.debug("Nodetool status succeeded and printed output {!r}".
                        format(output))
-        except subprocess.CalledProcessError:
+        except subprocess.CalledProcessError:  # pragma: no coverage
             _log.debug("hit error")
 
         if output != "":
