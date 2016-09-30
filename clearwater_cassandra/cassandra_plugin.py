@@ -154,7 +154,7 @@ class CassandraPlugin(SynchroniserPluginBase):
         # database
         if os.path.exists(self.CASSANDRA_YAML_FILE):
             os.remove(self.CASSANDRA_YAML_FILE)
-        
+
         # Stop Cassandra directly rather than going through any 'service'
         # commands - this should mean that supervisord keeps restarting
         # Cassandra when running in Docker.
@@ -162,7 +162,7 @@ class CassandraPlugin(SynchroniserPluginBase):
         # Note that we can't use the init.d script here, because cassandra.yaml
         # doesn't exist so it immediately exits.
         run_command("start-stop-daemon -K -p /var/run/cassandra/cassandra.pid -R TERM/30/KILL/5")
-        
+
         _log.info("Stopped Cassandra while changing config files")
 
         if destructive_restart:
@@ -193,7 +193,7 @@ class CassandraPlugin(SynchroniserPluginBase):
                 if (state == constants.JOINING_ACKNOWLEDGED_CHANGE or
                     state == constants.JOINING_CONFIG_CHANGED):
                     seeds_list.append(seed)
-            seeds_list = seeds_list + self._remote_seeds
+        seeds_list = seeds_list + self._remote_seeds
         return seeds_list
 
     def join_cassandra_cluster(self, cluster_view):
@@ -224,7 +224,7 @@ class CassandraPlugin(SynchroniserPluginBase):
         # auto-restarting it after decommissioning.
         if os.path.exists(self.CASSANDRA_YAML_FILE):
             os.remove(self.CASSANDRA_YAML_FILE)
- 
+
         run_command("nodetool decommission", self._sig_namespace)
 
     def wait_for_cassandra(self):
