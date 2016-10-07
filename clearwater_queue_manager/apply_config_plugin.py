@@ -41,7 +41,7 @@ class ApplyConfigPlugin(QueuePluginBase):
     def __init__(self, params):
         self._ignore_plugin_responses = params.ignore_plugin_responses
 
-    def key(self):
+    def key(self):  # pragma: no cover
         return "apply_config"
 
     def at_front_of_queue(self):
@@ -65,5 +65,5 @@ class ApplyConfigPlugin(QueuePluginBase):
             _log.info("Not checking service health")
             run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue remove_success apply_config")
 
-def load_as_plugin(params):
+def load_as_plugin(params):  # pragma: no cover
     return ApplyConfigPlugin(params)

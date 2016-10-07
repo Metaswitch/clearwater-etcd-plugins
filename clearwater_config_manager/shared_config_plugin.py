@@ -44,7 +44,7 @@ class SharedConfigPlugin(ConfigPluginBase):
     def __init__(self, _params):
         pass
 
-    def key(self):
+    def key(self):  # pragma: no cover
         return "shared_config"
 
     def file(self):
@@ -58,7 +58,7 @@ class SharedConfigPlugin(ConfigPluginBase):
                     return FileStatus.UP_TO_DATE
                 else:
                     return FileStatus.OUT_OF_SYNC
-        except IOError:
+        except IOError:  # pragma: no cover
             return FileStatus.MISSING
 
     def on_config_changed(self, value, alarm):
@@ -68,5 +68,5 @@ class SharedConfigPlugin(ConfigPluginBase):
             safely_write(_file, value)
             run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue add apply_config")
 
-def load_as_plugin(params):
+def load_as_plugin(params):  # pragma: no cover
     return SharedConfigPlugin(params)
