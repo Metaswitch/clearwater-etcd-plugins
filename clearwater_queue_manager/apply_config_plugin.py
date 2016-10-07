@@ -39,7 +39,7 @@ _log = logging.getLogger("apply_config_plugin")
 
 class ApplyConfigPlugin(QueuePluginBase):
     def __init__(self, params):
-        self._ignore_plugin_responses = params.ignore_plugin_responses
+        self._wait_plugin_complete = params.wait_plugin_complete
 
     def key(self):  # pragma: no cover
         return "apply_config"
@@ -53,7 +53,7 @@ class ApplyConfigPlugin(QueuePluginBase):
             for restart_script in os.listdir("/usr/share/clearwater/infrastructure/scripts/restart"):
                 run_command("/usr/share/clearwater/infrastructure/scripts/restart/" + restart_script)
  
-        if self._ignore_plugin_responses != "Y":
+        if self._wait_plugin_complete != "N":
             _log.info("Checking service health")
             if run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/check_node_health.py"):
                 _log.info("Services failed to restart successfully")
