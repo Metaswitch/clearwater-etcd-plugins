@@ -123,6 +123,7 @@ class CassandraPlugin(SynchroniserPluginBase):
         # Fill in the correct listen_address and seeds values in the yaml
         # document.
         doc["listen_address"] = self._ip
+        doc["broadcast_rpc_address"] = self._ip
 
         doc["seed_provider"][0]["parameters"][0]["seeds"] = seeds_list_str
         doc["endpoint_snitch"] = "GossipingPropertyFileSnitch"
