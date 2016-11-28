@@ -39,6 +39,7 @@ import os
 
 _log = logging.getLogger("shared_config_plugin")
 _file = "/etc/clearwater/shared_config"
+_default_value = ""
 
 class SharedConfigPlugin(ConfigPluginBase):
     def __init__(self, _params):
@@ -49,6 +50,9 @@ class SharedConfigPlugin(ConfigPluginBase):
 
     def file(self):
         return _file
+
+    def default_value(self):
+        return _default_value
 
     def status(self, value):
         try:

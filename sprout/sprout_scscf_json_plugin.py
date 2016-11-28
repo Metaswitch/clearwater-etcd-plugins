@@ -47,5 +47,11 @@ class SproutSCSCFJsonPlugin(SproutJsonPlugin):
     def __init__(self, _params):
         super(SproutSCSCFJsonPlugin, self).__init__("/etc/clearwater/s-cscf.json", "scscf_json")
 
+    _default_value = """\
+    {
+        "s-cscfs" : [
+        ]
+    }"""
+
 def load_as_plugin(params):
     return SproutSCSCFJsonPlugin(params)
