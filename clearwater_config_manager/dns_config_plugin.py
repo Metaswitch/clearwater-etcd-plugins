@@ -73,5 +73,10 @@ class DnsConfigPlugin(ConfigPluginBase):
             safely_write(_file, value)
             run_command("/usr/share/clearwater/bin/reload_dns_config")
 
+    def on_creating_etcd_key(self, value):
+        if value != _default_value:
+            run_command("/usr/share/clearwater/bin/reload_dns_config")
+
+
 def load_as_plugin(params):  # pragma: no cover
     return DnsConfigPlugin(params)
