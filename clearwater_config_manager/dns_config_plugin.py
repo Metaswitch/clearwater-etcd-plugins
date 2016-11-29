@@ -77,6 +77,5 @@ class DnsConfigPlugin(ConfigPluginBase):
         if value != _default_value:
             run_command("/usr/share/clearwater/bin/reload_dns_config")
 
-
 def load_as_plugin(params):  # pragma: no cover
     return DnsConfigPlugin(params)

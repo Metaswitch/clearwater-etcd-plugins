@@ -48,10 +48,10 @@ class SproutENUMJsonPlugin(SproutJsonPlugin):
         super(SproutENUMJsonPlugin, self).__init__("/etc/clearwater/enum.json", "enum_json")
 
     _default_value = """\
-    {
-        "routes" : [
-        ]
-    }"""
+{
+    "number_blocks" : [
+    ]
+}"""
 
 def load_as_plugin(params):
     return SproutENUMJsonPlugin(params)
