@@ -119,6 +119,7 @@ class ChronosPlugin(SynchroniserPluginBase):
     def on_stable_cluster(self, cluster_view):  # pragma: no cover
         self.write_cluster_settings(cluster_view)
         self._alarm.clear()
+        pdlogs.STABLE_CLUSTER.log(cluster_desc=self.cluster_description())
 
     def on_leaving_cluster(self, cluster_view):  # pragma: no cover
         pass
