@@ -54,7 +54,7 @@ class SharedConfigPlugin(ConfigPluginBase):
         try:
             with open(_file, "r") as ifile:
                 current = ifile.read()
-                if current == value:
+                if current == value:  # pragma: no cover
                     return FileStatus.UP_TO_DATE
                 else:
                     return FileStatus.OUT_OF_SYNC
