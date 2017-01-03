@@ -98,6 +98,7 @@ class CassandraPlugin(SynchroniserPluginBase):
     def on_stable_cluster(self, cluster_view):  # pragma: no cover
         _log.debug("Clearing Cassandra not-clustered alarm")
         self._clustering_alarm.clear()
+        pdlogs.STABLE_CLUSTER.log(cluster_desc=self.cluster_description())
 
     def on_leaving_cluster(self, cluster_view):
         decommission_alarm = alarm_manager.get_alarm(
