@@ -69,7 +69,3 @@ class SproutJsonPlugin(ConfigPluginBase):
         run_command("service sprout reload")
 
         alarm.update_file(self._file)
-
-    def on_creating_etcd_key(self, value):
-        if value != _default_value:
-            run_command("service sprout reload")

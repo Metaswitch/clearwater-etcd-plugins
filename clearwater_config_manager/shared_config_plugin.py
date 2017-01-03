@@ -39,7 +39,11 @@ import os
 
 _log = logging.getLogger("shared_config_plugin")
 _file = "/etc/clearwater/shared_config"
-_default_value = "### Create Shared Config Here ###"
+_default_value = """\
+#####################################################################
+# No Shared Config has been provided
+# Replace this file with the Shared Configuration for your deployment
+#####################################################################"""
 
 class SharedConfigPlugin(ConfigPluginBase):
     def __init__(self, _params):
@@ -70,12 +74,8 @@ class SharedConfigPlugin(ConfigPluginBase):
 
         if self.status(value) != FileStatus.UP_TO_DATE:
             safely_write(_file, value)
-            run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue add apply_config")
-
-    def on_creating_etcd_key(self, value):
-        if value != _default_value:
-            _log.debug("Created non-default config key in etcd. Adding node to restart queue")
-            run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue add apply_config")
+            if value != _default_value:
+                run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue add apply_config")
 
 def load_as_plugin(params):  # pragma: no cover
     return SharedConfigPlugin(params)
