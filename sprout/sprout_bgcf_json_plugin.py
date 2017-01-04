@@ -47,5 +47,11 @@ class SproutBGCFJsonPlugin(SproutJsonPlugin):
     def __init__(self, _params):
         super(SproutBGCFJsonPlugin, self).__init__("/etc/clearwater/bgcf.json", "bgcf_json")
 
+    _default_value = """\
+{
+    "routes" : [
+    ]
+}"""
+
 def load_as_plugin(params):
     return SproutBGCFJsonPlugin(params)

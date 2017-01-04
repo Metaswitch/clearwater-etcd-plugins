@@ -47,6 +47,9 @@ class SproutJsonPlugin(ConfigPluginBase):
     def file(self):
         return self._file
 
+    def default_value(self):
+        return self._default_value
+
     def status(self, value):
         try:
             with open(self._file, "r") as ifile:
