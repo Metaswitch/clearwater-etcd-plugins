@@ -87,10 +87,6 @@ class CassandraPlugin(SynchroniserPluginBase):
         self._clustering_alarm.set()
         self.join_cassandra_cluster(cluster_view)
 
-        if (self._ip == sorted(cluster_view.keys())[0]):
-            _log.debug("Adding schemas")
-            run_command("/usr/share/clearwater/infrastructure/scripts/cassandra_schemas/run_cassandra_schemas")
-
     def on_new_cluster_config_ready(self, cluster_view):  # pragma: no cover
         _log.debug("Raising Cassandra not-clustered alarm")
         self._clustering_alarm.set()
@@ -99,6 +95,10 @@ class CassandraPlugin(SynchroniserPluginBase):
         _log.debug("Clearing Cassandra not-clustered alarm")
         self._clustering_alarm.clear()
         pdlogs.STABLE_CLUSTER.log(cluster_desc=self.cluster_description())
+
+        if (self._ip == sorted(cluster_view.keys())[0]):
+            _log.debug("Adding schemas")
+            run_command("/usr/share/clearwater/infrastructure/scripts/cassandra_schemas/run_cassandra_schemas")
 
     def on_leaving_cluster(self, cluster_view):
         decommission_alarm = alarm_manager.get_alarm(
