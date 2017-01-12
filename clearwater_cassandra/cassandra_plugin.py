@@ -66,10 +66,10 @@ class CassandraPlugin(SynchroniserPluginBase):
 
     # Interface-defined plugin functions
 
-    def key(self):
+    def key(self):  # pragma: no cover
         return self._key
 
-    def cluster_description(self):
+    def cluster_description(self):  # pragma: no cover
         return "Cassandra cluster"
 
     def on_startup(self, cluster_view):
@@ -78,7 +78,7 @@ class CassandraPlugin(SynchroniserPluginBase):
             if seeds:
                 self.write_new_cassandra_config(seeds)
 
-    def on_cluster_changing(self, cluster_view):
+    def on_cluster_changing(self, cluster_view):  # pragma: no cover
         _log.debug("Raising Cassandra not-clustered alarm")
         self._clustering_alarm.set()
 
@@ -87,17 +87,18 @@ class CassandraPlugin(SynchroniserPluginBase):
         self._clustering_alarm.set()
         self.join_cassandra_cluster(cluster_view)
 
-        if (self._ip == sorted(cluster_view.keys())[0]):
-            _log.debug("Adding schemas")
-            run_command("/usr/share/clearwater/infrastructure/scripts/cassandra_schemas/run_cassandra_schemas")
-
-    def on_new_cluster_config_ready(self, cluster_view):
+    def on_new_cluster_config_ready(self, cluster_view):  # pragma: no cover
         _log.debug("Raising Cassandra not-clustered alarm")
         self._clustering_alarm.set()
 
-    def on_stable_cluster(self, cluster_view):
+    def on_stable_cluster(self, cluster_view):  # pragma: no cover
         _log.debug("Clearing Cassandra not-clustered alarm")
         self._clustering_alarm.clear()
+        pdlogs.STABLE_CLUSTER.log(cluster_desc=self.cluster_description())
+
+        if (self._ip == sorted(cluster_view.keys())[0]):
+            _log.debug("Adding schemas")
+            run_command("/usr/share/clearwater/infrastructure/scripts/cassandra_schemas/run_cassandra_schemas")
 
     def on_leaving_cluster(self, cluster_view):
         decommission_alarm = alarm_manager.get_alarm(
@@ -107,7 +108,7 @@ class CassandraPlugin(SynchroniserPluginBase):
         self.leave_cassandra_cluster()
         decommission_alarm.clear()
 
-    def files(self):
+    def files(self):  # pragma: no cover
         return ["/etc/cassandra/cassandra.yaml"]
 
     # Specific methods for handling Cassandra
@@ -123,6 +124,7 @@ class CassandraPlugin(SynchroniserPluginBase):
         # Fill in the correct listen_address and seeds values in the yaml
         # document.
         doc["listen_address"] = self._ip
+        doc["broadcast_rpc_address"] = self._ip
 
         doc["seed_provider"][0]["parameters"][0]["seeds"] = seeds_list_str
         doc["endpoint_snitch"] = "GossipingPropertyFileSnitch"
@@ -138,7 +140,7 @@ class CassandraPlugin(SynchroniserPluginBase):
             # We want the timeout value to be 4/5ths the maximum acceptable time
             # of a HTTP request (which is 5 * target latency)
             timeout = (int(latency) / 1000) * 4
-        except ValueError:
+        except ValueError:  #  pragma: no cover
             timeout = 400
 
         doc["read_request_timeout_in_ms"] = timeout
@@ -154,7 +156,7 @@ class CassandraPlugin(SynchroniserPluginBase):
         # database
         if os.path.exists(self.CASSANDRA_YAML_FILE):
             os.remove(self.CASSANDRA_YAML_FILE)
-        
+
         # Stop Cassandra directly rather than going through any 'service'
         # commands - this should mean that supervisord keeps restarting
         # Cassandra when running in Docker.
@@ -162,7 +164,7 @@ class CassandraPlugin(SynchroniserPluginBase):
         # Note that we can't use the init.d script here, because cassandra.yaml
         # doesn't exist so it immediately exits.
         run_command("start-stop-daemon -K -p /var/run/cassandra/cassandra.pid -R TERM/30/KILL/5")
-        
+
         _log.info("Stopped Cassandra while changing config files")
 
         if destructive_restart:
@@ -188,7 +190,7 @@ class CassandraPlugin(SynchroniserPluginBase):
                 state == constants.NORMAL):
                 seeds_list.append(seed)
 
-        if len(seeds_list) == 0:
+        if len(seeds_list) == 0:  # pragma: no cover
             for seed, state in cluster_view.items():
                 if (state == constants.JOINING_ACKNOWLEDGED_CHANGE or
                     state == constants.JOINING_CONFIG_CHANGED):
@@ -203,7 +205,7 @@ class CassandraPlugin(SynchroniserPluginBase):
                                             destructive_restart=True)
 
             _log.debug("Cassandra node successfully clustered")
-        else:
+        else:  # pragma: no cover
             # Something has gone wrong - the local node should be WAITING_TO_JOIN in
             # etcd (at the very least).
             _log.warning("No Cassandra cluster defined in etcd - unable to join")
@@ -216,7 +218,7 @@ class CassandraPlugin(SynchroniserPluginBase):
     def leave_cassandra_cluster(self):
         # We need Cassandra to be running so that we can connect on port 9160 and
         # decommission it. Check if we can connect on port 9160.
-        if not self.can_contact_cassandra():
+        if not self.can_contact_cassandra():  # pragma: no cover
             self.wait_for_cassandra()
 
         # Remove the cassandra.yaml file first - Cassandra won't start up while
@@ -224,7 +226,7 @@ class CassandraPlugin(SynchroniserPluginBase):
         # auto-restarting it after decommissioning.
         if os.path.exists(self.CASSANDRA_YAML_FILE):
             os.remove(self.CASSANDRA_YAML_FILE)
- 
+
         run_command("nodetool decommission", self._sig_namespace)
 
     def wait_for_cassandra(self):
@@ -235,7 +237,7 @@ class CassandraPlugin(SynchroniserPluginBase):
         _log.info("Waiting for Cassandra to come up...")
         # Wait until we can connect on port 9160 - i.e. Cassandra is running.
         attempts = 0;
-        while not self.can_contact_cassandra():
+        while not self.can_contact_cassandra():  # pragma: no cover
             # Sleep so we don't tight loop
             time.sleep(1)
             attempts += 1
@@ -248,5 +250,5 @@ class CassandraPlugin(SynchroniserPluginBase):
         run_command("sudo service clearwater-infrastructure restart")
 
 
-def load_as_plugin(params):
+def load_as_plugin(params):  # pragma: no cover
     return CassandraPlugin(params)

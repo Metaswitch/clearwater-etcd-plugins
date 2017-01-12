@@ -47,5 +47,11 @@ class SproutENUMJsonPlugin(SproutJsonPlugin):
     def __init__(self, _params):
         super(SproutENUMJsonPlugin, self).__init__("/etc/clearwater/enum.json", "enum_json")
 
+    _default_value = """\
+{
+    "number_blocks" : [
+    ]
+}"""
+
 def load_as_plugin(params):
     return SproutENUMJsonPlugin(params)

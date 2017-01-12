@@ -36,6 +36,11 @@ import logging
 
 _log = logging.getLogger("dns_config_plugin")
 _file = "/etc/clearwater/dns_config"
+_default_value = """\
+{
+  "hostnames": [
+  ]
+}"""
 
 class DnsConfigPlugin(ConfigPluginBase):
     def __init__(self, _params):
@@ -46,6 +51,9 @@ class DnsConfigPlugin(ConfigPluginBase):
 
     def file(self):
         return _file
+
+    def default_value(self):
+        return _default_value
 
     def status(self, value):
         try:
