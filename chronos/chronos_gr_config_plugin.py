@@ -39,6 +39,11 @@ import os
 
 _log = logging.getLogger("chronos_gr_config_plugin")
 _file = "/etc/chronos/chronos_gr.conf"
+_default_value = """\
+#####################################################################
+# No Chronos GR Config has been provided
+# Replace this file with the Chronos GR config for your deployment
+#####################################################################"""
 
 class ChronosGRConfigPlugin(ConfigPluginBase):
     def __init__(self, _params):
@@ -49,6 +54,9 @@ class ChronosGRConfigPlugin(ConfigPluginBase):
 
     def file(self):
         return _file
+
+    def default_value(self): # pragma: no cover
+        return _default_value
 
     def status(self, value):
         try:
