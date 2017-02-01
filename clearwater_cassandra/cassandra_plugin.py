@@ -53,6 +53,9 @@ class CassandraPlugin(SynchroniserPluginBase):
     CASSANDRA_YAML_FILE = "/etc/cassandra/cassandra.yaml"
     CASSANDRA_TOPOLOGY_FILE = "/etc/cassandra/cassandra-rackdc.properties"
 
+    BOOTSTRAP_IN_PROGRESS_FLAG = "/etc/clearwater/bootstrap_in_progress"
+    BOOTSTRAPPED_FLAG = "/etc/clearwater/bootstrapped"
+
     def __init__(self, params):
         self._ip = params.ip
         self._local_site = params.local_site
@@ -163,20 +166,39 @@ class CassandraPlugin(SynchroniserPluginBase):
         #
         # Note that we can't use the init.d script here, because cassandra.yaml
         # doesn't exist so it immediately exits.
-        run_command("start-stop-daemon -K -p /var/run/cassandra/cassandra.pid -R TERM/30/KILL/5")
+        #
+        # We do not want to kill cassandra if it is in the process of bootstrapping
+        if not os.path.exists(self.BOOTSTRAP_IN_PROGRESS_FLAG):
+            run_command("start-stop-daemon -K -p /var/run/cassandra/cassandra.pid -R TERM/30/KILL/5")
+            _log.info("Stopped Cassandra while changing config files")
 
-        _log.info("Stopped Cassandra while changing config files")
-
-        if destructive_restart:
+        # We only want to perform these steps the first time we join a cluster
+        # If we are bootstrapping, or already bootstrapped, doing this will leave
+        # us unable to rejoin the cluster properly
+        if (destructive_restart
+        and not (os.path.exists(self.BOOTSTRAPPED_FLAG)
+                or os.path.exists(self.BOOTSTRAP_IN_PROGRESS_FLAG))):
             _log.warn("Deleting /var/lib/cassandra - this is normal on initial clustering")
             run_command("rm -rf /var/lib/cassandra/")
             run_command("mkdir -m 755 /var/lib/cassandra")
             run_command("chown -R cassandra /var/lib/cassandra")
 
+            # Set a state flag if we have performed a destructive restart, and not yet
+            # completed bootstrapping. This will stop us re-deleting the data directory
+            # if the cluster_manager dies, ensuring we cluster correctly.
+            open(self.BOOTSTRAP_IN_PROGRESS_FLAG, 'a').close()
+
         # Write back to cassandra.yaml - this allows Cassandra to start again.
         safely_write(self.CASSANDRA_TOPOLOGY_FILE, topology)
         safely_write(self.CASSANDRA_YAML_FILE, contents)
+
         self.wait_for_cassandra()
+
+        # If we were previously bootstrapping, alter the state flag to indicate
+        # the process is complete. We will remove this when we leave the cluster
+        if os.path.exists(self.BOOTSTRAP_IN_PROGRESS_FLAG):
+            os.rename(self.BOOTSTRAP_IN_PROGRESS_FLAG,
+                      self.BOOTSTRAPPED_FLAG)
 
         if os.path.exists("/etc/clearwater/force_cassandra_yaml_refresh"):
             os.remove("/etc/clearwater/force_cassandra_yaml_refresh")
@@ -228,6 +250,11 @@ class CassandraPlugin(SynchroniserPluginBase):
             os.remove(self.CASSANDRA_YAML_FILE)
 
         run_command("nodetool decommission", self._sig_namespace)
+
+        # Remove the bootstrapped flag so that we bootstrap correctly
+        # if rejoining the cluster again in future.
+        if os.path.exists(self.BOOTSTRAPPED_FLAG):
+            os.remove(self.BOOTSTRAPPED_FLAG)
 
     def wait_for_cassandra(self):
         # Don't start Cassandra, just rely on monit or supervisord to start it
