@@ -53,8 +53,8 @@ class CassandraPlugin(SynchroniserPluginBase):
     CASSANDRA_YAML_FILE = "/etc/cassandra/cassandra.yaml"
     CASSANDRA_TOPOLOGY_FILE = "/etc/cassandra/cassandra-rackdc.properties"
 
-    BOOTSTRAP_IN_PROGRESS_FLAG = "/etc/clearwater/bootstrap_in_progress"
-    BOOTSTRAPPED_FLAG = "/etc/clearwater/bootstrapped"
+    BOOTSTRAP_IN_PROGRESS_FLAG = "/etc/cassandra/cassandra_bootstrap_in_progress"
+    BOOTSTRAPPED_FLAG = "/etc/cassandra/cassandra_bootstrapped"
 
     def __init__(self, params):
         self._ip = params.ip
@@ -175,9 +175,9 @@ class CassandraPlugin(SynchroniserPluginBase):
         # We only want to perform these steps the first time we join a cluster
         # If we are bootstrapping, or already bootstrapped, doing this will leave
         # us unable to rejoin the cluster properly
-        if (destructive_restart
-        and not (os.path.exists(self.BOOTSTRAPPED_FLAG)
-                or os.path.exists(self.BOOTSTRAP_IN_PROGRESS_FLAG))):
+        if ((destructive_restart) and not
+            ((os.path.exists(self.BOOTSTRAPPED_FLAG) or
+             (os.path.exists(self.BOOTSTRAP_IN_PROGRESS_FLAG))))):
             _log.warn("Deleting /var/lib/cassandra - this is normal on initial clustering")
             run_command("rm -rf /var/lib/cassandra/")
             run_command("mkdir -m 755 /var/lib/cassandra")
@@ -251,8 +251,10 @@ class CassandraPlugin(SynchroniserPluginBase):
 
         run_command("nodetool decommission", self._sig_namespace)
 
-        # Remove the bootstrapped flag so that we bootstrap correctly
+        # Remove the bootstrapping flags so that we bootstrap correctly
         # if rejoining the cluster again in future.
+        if os.path.exists(self.BOOTSTRAP_IN_PROGRESS_FLAG):
+            os.remove(self.BOOTSTRAP_IN_PROGRESS_FLAG)
         if os.path.exists(self.BOOTSTRAPPED_FLAG):
             os.remove(self.BOOTSTRAPPED_FLAG)
 
