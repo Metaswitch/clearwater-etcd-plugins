@@ -1,5 +1,5 @@
 # Project Clearwater - IMS in the Cloud
-# Copyright (C) 2015  Metaswitch Networks Ltd
+# Copyright (C) 2016  Metaswitch Networks Ltd
 #
 # This program is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the
@@ -30,52 +30,43 @@
 # under which the OpenSSL Project distributes the OpenSSL toolkit software,
 # as those licenses appear in the file LICENSE-OPENSSL.
 
-from metaswitch.clearwater.config_manager.plugin_base import ConfigPluginBase, FileStatus
-from metaswitch.clearwater.etcd_shared.plugin_utils import run_command, safely_write
-from time import sleep
+from metaswitch.clearwater.queue_manager.plugin_base import QueuePluginBase
+from metaswitch.clearwater.etcd_shared.plugin_utils import run_command
 import logging
-import shutil
 import os
 
-_log = logging.getLogger("shared_config_plugin")
-_file = "/etc/clearwater/shared_config"
-_default_value = """\
-#####################################################################
-# No Shared Config has been provided
-# Replace this file with the Shared Configuration for your deployment
-#####################################################################"""
+_log = logging.getLogger("apply_chronos_gr_config_plugin")
 
-class SharedConfigPlugin(ConfigPluginBase):
+class ApplyChronosGRConfigPlugin(QueuePluginBase):
     def __init__(self, _params):
         pass
 
-    def key(self):  # pragma: no cover
-        return "shared_config"
+    # How long to wait for a node to do whatever it does while it's
+    # at the front of the queue.
+    WAIT_FOR_THIS_NODE = 600
+    WAIT_FOR_OTHER_NODE = 600
 
-    def file(self):
-        return _file
+    def local_alarm(self): # pragma: no cover
+        return ((9004, 1, 5, 3),
+                "local")
 
-    def default_value(self):
-        return _default_value
+    def global_alarm(self): # pragma: no cover
+        return ((9003, 1, 5, 3),
+                "global")
 
-    def status(self, value):
-        try:
-            with open(_file, "r") as ifile:
-                current = ifile.read()
-                if current == value:  # pragma: no cover
-                    return FileStatus.UP_TO_DATE
-                else:
-                    return FileStatus.OUT_OF_SYNC
-        except IOError:  # pragma: no cover
-            return FileStatus.MISSING
+    def key(self): # pragma: no cover
+        return "apply_chronos_gr_config"
 
-    def on_config_changed(self, value, alarm):
-        _log.info("Updating shared configuration file")
+    def at_front_of_queue(self):
+        _log.info("Restarting Chronos")
+        if run_command("service chronos stop"):
+            _log.warning("Unable to stop Chronos successfully")
+        if run_command("service chronos wait-sync"):
+            _log.warning("Unable to resync Chronos successfully")
+        if run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue remove_success apply_chronos_gr_config"):
+            _log.warning("Unable to remove this node from the resync queue")
+        _log.info("Chronos restarted")
 
-        if self.status(value) != FileStatus.UP_TO_DATE:
-            safely_write(_file, value)
-            if value != _default_value:
-                run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue add apply_config")
 
-def load_as_plugin(params):  # pragma: no cover
-    return SharedConfigPlugin(params)
+def load_as_plugin(params): # pragma: no cover
+    return ApplyChronosGRConfigPlugin(params)

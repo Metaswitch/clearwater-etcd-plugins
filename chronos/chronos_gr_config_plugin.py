@@ -1,5 +1,5 @@
 # Project Clearwater - IMS in the Cloud
-# Copyright (C) 2015  Metaswitch Networks Ltd
+# Copyright (C) 2016  Metaswitch Networks Ltd
 #
 # This program is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the
@@ -37,25 +37,25 @@ import logging
 import shutil
 import os
 
-_log = logging.getLogger("shared_config_plugin")
-_file = "/etc/clearwater/shared_config"
+_log = logging.getLogger("chronos_gr_config_plugin")
+_file = "/etc/chronos/chronos_gr.conf"
 _default_value = """\
 #####################################################################
-# No Shared Config has been provided
-# Replace this file with the Shared Configuration for your deployment
+# No Chronos GR Config has been provided
+# Replace this file with the Chronos GR config for your deployment
 #####################################################################"""
 
-class SharedConfigPlugin(ConfigPluginBase):
+class ChronosGRConfigPlugin(ConfigPluginBase):
     def __init__(self, _params):
         pass
 
-    def key(self):  # pragma: no cover
-        return "shared_config"
+    def key(self): # pragma: no cover
+        return "chronos_gr_config"
 
     def file(self):
         return _file
 
-    def default_value(self):
+    def default_value(self): # pragma: no cover
         return _default_value
 
     def status(self, value):
@@ -70,12 +70,11 @@ class SharedConfigPlugin(ConfigPluginBase):
             return FileStatus.MISSING
 
     def on_config_changed(self, value, alarm):
-        _log.info("Updating shared configuration file")
+        _log.info("Updating Chronos GR configuration file")
 
         if self.status(value) != FileStatus.UP_TO_DATE:
             safely_write(_file, value)
-            if value != _default_value:
-                run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue add apply_config")
+            run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue add apply_chronos_gr_config")
 
-def load_as_plugin(params):  # pragma: no cover
-    return SharedConfigPlugin(params)
+def load_as_plugin(params): # pragma: no cover
+    return ChronosGRConfigPlugin(params)
