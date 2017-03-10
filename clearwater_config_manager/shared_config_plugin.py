@@ -36,6 +36,7 @@ from time import sleep
 import logging
 import shutil
 import os
+import codecs
 
 _log = logging.getLogger("shared_config_plugin")
 _file = "/etc/clearwater/shared_config"
@@ -60,7 +61,7 @@ class SharedConfigPlugin(ConfigPluginBase):
 
     def status(self, value):
         try:
-            with open(_file, "r") as ifile:
+            with codecs.open(_file, "r", encoding="utf-8") as ifile:
                 current = ifile.read()
                 if current == value:  # pragma: no cover
                     return FileStatus.UP_TO_DATE
