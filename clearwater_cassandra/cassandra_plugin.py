@@ -132,21 +132,9 @@ class CassandraPlugin(SynchroniserPluginBase):
         doc["seed_provider"][0]["parameters"][0]["seeds"] = seeds_list_str
         doc["endpoint_snitch"] = "GossipingPropertyFileSnitch"
 
-        # Work out the timeout from the target_latency_us value (assuming
-        # 100000 if it isn't set)
-        get_latency_cmd = "target_latency_us=100000; . /etc/clearwater/config; echo -n $target_latency_us"
-        latency = subprocess.check_output(get_latency_cmd,
-                                          shell=True,
-                                          stderr=subprocess.STDOUT)
-
-        try:
-            # We want the timeout value to be 4/5ths the maximum acceptable time
-            # of a HTTP request (which is 5 * target latency)
-            timeout = (int(latency) / 1000) * 4
-        except ValueError:  #  pragma: no cover
-            timeout = 400
-
-        doc["read_request_timeout_in_ms"] = timeout
+        # The read request timeout must not be higher than the Thrift connection
+        # timeout, which is currently set to 250ms
+        doc["read_request_timeout_in_ms"] = 230
 
         contents = WARNING_HEADER + "\n" + yaml.dump(doc)
         topology = WARNING_HEADER + "\n" + "dc={}\nrack=RAC1\n".format(self._local_site)
