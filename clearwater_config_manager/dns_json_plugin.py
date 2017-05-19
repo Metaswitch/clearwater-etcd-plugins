@@ -34,20 +34,20 @@ from metaswitch.clearwater.config_manager.plugin_base import ConfigPluginBase, F
 from metaswitch.clearwater.etcd_shared.plugin_utils import run_command, safely_write
 import logging
 
-_log = logging.getLogger("dns_config_plugin")
-_file = "/etc/clearwater/dns_config"
+_log = logging.getLogger("dns_json_plugin")
+_file = "/etc/clearwater/dns.json"
 _default_value = """\
 {
   "hostnames": [
   ]
 }"""
 
-class DnsConfigPlugin(ConfigPluginBase):
+class DNSJSONPlugin(ConfigPluginBase):
     def __init__(self, _params):
         pass
 
     def key(self):  # pragma: no cover
-        return "dns_config"
+        return "dns_json"
 
     def file(self):
         return _file
@@ -67,11 +67,11 @@ class DnsConfigPlugin(ConfigPluginBase):
             return FileStatus.MISSING
 
     def on_config_changed(self, value, alarm):
-        _log.info("Updating dns configuration file")
+        _log.info("Updating DNS configuration file")
 
         if self.status(value) != FileStatus.UP_TO_DATE:
             safely_write(_file, value)
-            run_command("/usr/share/clearwater/bin/reload_dns_config")
+            run_command("/usr/share/clearwater/bin/reload_dns_json")
 
 def load_as_plugin(params):  # pragma: no cover
-    return DnsConfigPlugin(params)
+    return DNSJSONPlugin(params)
