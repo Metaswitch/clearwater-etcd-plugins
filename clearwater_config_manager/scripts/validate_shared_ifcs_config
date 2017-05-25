@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Project Clearwater - IMS in the Cloud
 # Copyright (C) 2017  Metaswitch Networks Ltd
 #
@@ -30,48 +32,30 @@
 # under which the OpenSSL Project distributes the OpenSSL toolkit software,
 # as those licenses appear in the file LICENSE-OPENSSL.
 
-from metaswitch.clearwater.config_manager.plugin_base import ConfigPluginBase, FileStatus
-from metaswitch.clearwater.etcd_shared.plugin_utils import run_command, safely_write
-import logging
+FILENAME=/etc/clearwater/shared_ifcs.xml
+SCHEMA=/usr/share/clearwater/clearwater-config-manager/scripts/config_validation/shared_ifcs_schema.xsd
 
-_log = logging.getLogger("shared_ifcs_config_plugin")
-_file = "/etc/clearwater/shared_ifcs.xml"
+. /usr/share/clearwater/utils/check-root-permissions 1
 
-_default_value = """\
-<?xml version="1.0" encoding="UTF-8"?>
-<SharedIFCsSets>
-</SharedIFCsSets>"""
+[ $# -le 1 ] || { echo "Usage: validate_shared_ifcs_config [file to validate] (defaults to $FILENAME if not specified)" >&2 ; exit 2 ; }
+[ -z "$1" ] || FILENAME=$1
 
-class SharedIFCsConfigPlugin(ConfigPluginBase):
-    def __init__(self, _params):
-        pass
+# Check that the file to validate is present.
+if [[ ! -f $FILENAME ]]
+then
+    echo "No configuration file at $FILENAME, unable to validate"
+    exit 2
+fi
 
-    def key(self):  # pragma: no cover
-        return "shared_ifcs"
+xmllint --format --pretty 1 --load-trace --debug --schema $SCHEMA $FILENAME 2> /tmp/validate-shared-ifcs-config.stderr.$$ > /tmp/validate-shared-ifcs-config.stdout.$$
+rc=$?
 
-    def file(self):
-        return _file
+# Check the return code and log if appropriate.
+if [ $rc != 0 ] ; then
+  echo The Shared IFC file is invalid                       >&2
+  cat /tmp/validate-shared-ifcs-config.stderr.$$            >&2
+  cat /tmp/validate-shared-ifcs-config.stdout.$$            >&2
+fi
+rm -f /tmp/validate-shared-ifcs-config.stderr.$$ /tmp/validate-shared-ifcs-config.stdout.$$
 
-    def default_value(self):
-        return _default_value
-
-    def status(self, value):
-        try:
-            with open(_file, "r") as ifile:
-                current = ifile.read()
-                if current == value:
-                    return FileStatus.UP_TO_DATE
-                else:
-                    return FileStatus.OUT_OF_SYNC
-        except IOError:  # pragma: no cover
-            return FileStatus.MISSING
-
-    def on_config_changed(self, value, alarm):
-        _log.info("Updating Shared IFCs configuration file")
-
-        if self.status(value) != FileStatus.UP_TO_DATE:
-            safely_write(_file, value)
-            run_command("/usr/share/clearwater/bin/reload_shared_ifcs_config")
-
-def load_as_plugin(params):  # pragma: no cover
-    return SharedIFCsConfigPlugin(params)
+exit $rc

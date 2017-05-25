@@ -38,7 +38,7 @@ _log = logging.getLogger("default_ifcs_config_plugin")
 _file = "/etc/clearwater/default_ifcs.xml"
 
 _default_value = """\
-<?xml version=1.0 encoding=UTF-8?>
+<?xml version="1.0" encoding="UTF-8"?>
 <DefaultIFCsSet>
 </DefaultIFCsSet>"""
 

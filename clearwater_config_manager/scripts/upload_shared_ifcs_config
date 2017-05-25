@@ -33,7 +33,7 @@
 # as those licenses appear in the file LICENSE-OPENSSL.
 
 FILENAME=/etc/clearwater/shared_ifcs.xml
-SCHEMA=/usr/share/clearwater/cleawater-config-manager/scripts/config_validation/shared_ifcs.xsd
+SCHEMA=/usr/share/clearwater/clearwater-config-manager/scripts/config_validation/shared_ifcs_schema.xsd
 local_site_name=site1
 etcd_key=clearwater
 . /etc/clearwater/config
@@ -58,7 +58,7 @@ then
     exit 2
 fi
 
-xmllint --format --pretty 1 --load-trace --debug --schema $SCHEMA $FILENAME
+xmllint --format --pretty 1 --load-trace --debug --schema $SCHEMA $FILENAME 2> /tmp/upload-shared-ifcs-config.stderr.$$ > /tmp/upload-shared-ifcs-config.stdout.$$
 rc=$?
 
 # Check the return code and log if appropriate.
