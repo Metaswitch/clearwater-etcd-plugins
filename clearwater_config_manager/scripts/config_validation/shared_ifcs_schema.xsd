@@ -154,7 +154,7 @@
   </xs:complexType>
   <xs:complexType name="tInitialFilterCriteria">
     <xs:sequence>
-      <xs:element name="Priority" type="tPriority"/>
+      <xs:element name="Priority" type="tPriority" minOccurs="0"/>
       <xs:element name="TriggerPoint" type="tTrigger" minOccurs="0"/>
       <xs:element name="ApplicationServer" type="tApplicationServer"/>
       <xs:element name="ProfilePartIndicator" type="tProfilePartIndicator" minOccurs="0"/>
@@ -233,7 +233,7 @@
   <xs:element name="SharedIFCsSets">
   <xs:complexType>
     <xs:sequence>
-        <xs:element name="SharedIFCsSet" maxOccurs="unbounded">
+        <xs:element name="SharedIFCsSet" minOccurs="0" maxOccurs="unbounded">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="SetID" type="xs:unsignedInt" minOccurs="1" maxOccurs="1"/>

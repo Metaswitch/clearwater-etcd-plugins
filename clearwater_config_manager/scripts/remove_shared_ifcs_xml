@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Copyright (C) Metaswitch Networks 2017
+# If license terms are provided to you in a COPYING file in the root directory
+# of the source code repository by which you are accessing this code, then
+# the license outlined in that COPYING file applies to your use.
+# Otherwise no rights are granted except for those provided to you by
+# Metaswitch Networks in a separate written agreement.
+
+local_site_name=site1
+etcd_key=clearwater
+. /etc/clearwater/config
+. /usr/share/clearwater/utils/check-root-permissions 1
+
+# Check we can contact `etcd`
+if ! nc -z ${management_local_ip:-$local_ip} 4000
+then
+  echo "The Clearwater Configuration store (etcd) is not running"
+  echo "Please start it before removing configuration"
+  exit 2
+fi
+
+clearwater-etcdctl set /$etcd_key/$local_site_name/configuration/shared_ifcs "<?xml version="1.0" encoding="UTF-8"?><SharedIFCsSets></SharedIFCsSets>" 2> /tmp/remove-shared-ifcs-xml.stderr.$$ > /tmp/remove-shared-ifcs-xml.stdout.$$
+rc=$?
+
+# Check the return code and log if appropriate.
+if [ $rc != 0 ] ; then
+  echo Unable to remove the Shared IFCs                  >&2
+  cat /tmp/remove-shared-ifcs-xml.stderr.$$              >&2
+  cat /tmp/remove-shared-ifcs-xml.stdout.$$              >&2
+else
+  echo Shared IFCs removed
+fi
+rm -f /tmp/remove-shared-ifcs-xml.stderr.$$ /tmp/remove-shared-ifcs-xml.stdout.$$
