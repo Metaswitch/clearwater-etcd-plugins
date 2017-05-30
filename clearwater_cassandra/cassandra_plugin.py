@@ -132,6 +132,13 @@ class CassandraPlugin(SynchroniserPluginBase):
         doc["seed_provider"][0]["parameters"][0]["seeds"] = seeds_list_str
         doc["endpoint_snitch"] = "GossipingPropertyFileSnitch"
 
+        # We use Thrift timeouts of 250ms, and we need the Cassandra timeouts to
+        # be able to time out before that, including inter-node latency, so we
+        # set timeouts of 190ms for reads, range-reads and writes
+        doc["read_request_timeout_in_ms"] = 190
+        doc["range_request_timeout_in_ms"] = 190
+        doc["write_request_timeout_in_ms"] = 190
+
         contents = WARNING_HEADER + "\n" + yaml.dump(doc)
         topology = WARNING_HEADER + "\n" + "dc={}\nrack=RAC1\n".format(self._local_site)
 
