@@ -7,12 +7,12 @@
 # Otherwise no rights are granted except for those provided to you by
 # Metaswitch Networks in a separate written agreement.
 
-FILENAME=/etc/clearwater/default_ifcs.xml
-SCHEMA=/usr/share/clearwater/clearwater-config-manager/scripts/config_validation/default_ifcs_schema.xsd
+FILENAME=/etc/clearwater/fallback_ifcs.xml
+SCHEMA=/usr/share/clearwater/clearwater-config-manager/scripts/config_validation/fallback_ifcs_schema.xsd
 
 . /usr/share/clearwater/utils/check-root-permissions 1
 
-[ $# -le 1 ] || { echo "Usage: validate_default_ifcs_xml [file to validate] (defaults to $FILENAME if not specified)" >&2 ; exit 2 ; }
+[ $# -le 1 ] || { echo "Usage: validate_fallback_ifcs_xml [file to validate] (defaults to $FILENAME if not specified)" >&2 ; exit 2 ; }
 [ -z "$1" ] || FILENAME=$1
 
 # Check that the file to validate is present.
@@ -22,17 +22,17 @@ then
     exit 2
 fi
 
-xmllint --format --pretty 1 --load-trace --debug --schema $SCHEMA $FILENAME 2> /tmp/validate-default-ifcs-xml.stderr.$$ > /tmp/validate-default-ifcs-xml.stdout.$$
+xmllint --format --pretty 1 --load-trace --debug --schema $SCHEMA $FILENAME 2> /tmp/validate-fallback-ifcs-xml.stderr.$$ > /tmp/validate-fallback-ifcs-xml.stdout.$$
 rc=$?
 
 # Check the return code and log if appropriate.
 if [ $rc != 0 ] ; then
-  echo The Default IFC file is invalid                    >&2
-  cat /tmp/validate-default-ifcs-xml.stderr.$$            >&2
+  echo The fallback IFC file is invalid                    >&2
+  cat /tmp/validate-fallback-ifcs-xml.stderr.$$            >&2
 else
-  echo The Default IFC file is valid
+  echo The fallback IFC file is valid
 fi
 
-rm -f /tmp/validate-default-ifcs-xml.stderr.$$ /tmp/validate-default-ifcs-xml.stdout.$$
+rm -f /tmp/validate-fallback-ifcs-xml.stderr.$$ /tmp/validate-fallback-ifcs-xml.stdout.$$
 
 exit $rc
