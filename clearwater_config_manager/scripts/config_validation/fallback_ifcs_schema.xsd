@@ -230,7 +230,7 @@
       <xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
-  <xs:element name="DefaultIFCsSet">
+  <xs:element name="FallbackIFCsSet">
     <xs:complexType>
       <xs:sequence>
         <xs:element name="InitialFilterCriteria" type="tInitialFilterCriteria" minOccurs="0" maxOccurs="unbounded"/>

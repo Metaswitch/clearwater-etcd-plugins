@@ -9,20 +9,20 @@ from metaswitch.clearwater.config_manager.plugin_base import ConfigPluginBase, F
 from metaswitch.clearwater.etcd_shared.plugin_utils import run_command, safely_write
 import logging
 
-_log = logging.getLogger("default_ifcs_xml_plugin")
-_file = "/etc/clearwater/default_ifcs.xml"
+_log = logging.getLogger("fallback_ifcs_xml_plugin")
+_file = "/etc/clearwater/fallback_ifcs.xml"
 
 _default_value = """\
 <?xml version="1.0" encoding="UTF-8"?>
-<DefaultIFCsSet>
-</DefaultIFCsSet>"""
+<FallbackIFCsSet>
+</FallbackIFCsSet>"""
 
-class DefaultIFCsXMLPlugin(ConfigPluginBase):
+class FallbackIFCsXMLPlugin(ConfigPluginBase):
     def __init__(self, _params):
         pass
 
     def key(self):  # pragma: no cover
-        return "default_ifcs"
+        return "fallback_ifcs"
 
     def file(self):
         return _file
@@ -42,11 +42,11 @@ class DefaultIFCsXMLPlugin(ConfigPluginBase):
             return FileStatus.MISSING
 
     def on_config_changed(self, value, alarm):
-        _log.info("Updating Default IFCs configuration file")
+        _log.info("Updating Fallback IFCs configuration file")
 
         if self.status(value) != FileStatus.UP_TO_DATE:
             safely_write(_file, value)
-            run_command("/usr/share/clearwater/bin/reload_default_ifcs_xml")
+            run_command("/usr/share/clearwater/bin/reload_fallback_ifcs_xml")
 
 def load_as_plugin(params):  # pragma: no cover
-    return DefaultIFCsXMLPlugin(params)
+    return FallbackIFCsXMLPlugin(params)
