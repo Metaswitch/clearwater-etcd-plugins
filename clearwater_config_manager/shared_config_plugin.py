@@ -37,6 +37,7 @@ import logging
 import shutil
 import os
 import codecs
+import subprocess
 
 _log = logging.getLogger("shared_config_plugin")
 _file = "/etc/clearwater/shared_config"
@@ -76,7 +77,8 @@ class SharedConfigPlugin(ConfigPluginBase):
         if self.status(value) != FileStatus.UP_TO_DATE:
             safely_write(_file, value)
             if value != _default_value:
-                run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue add apply_config")
+                apply_config_key = subprocess.check_output(["/usr/share/clearwater/clearwater-queue-manager/scripts/get_apply_config_key"])
+                run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue add {}".format(apply_config_key))
 
 def load_as_plugin(params):  # pragma: no cover
     return SharedConfigPlugin(params)
