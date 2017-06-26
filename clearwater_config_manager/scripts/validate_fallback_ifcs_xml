@@ -10,8 +10,6 @@
 FILENAME=/etc/clearwater/fallback_ifcs.xml
 SCHEMA=/usr/share/clearwater/clearwater-config-manager/scripts/config_validation/fallback_ifcs_schema.xsd
 
-. /usr/share/clearwater/utils/check-root-permissions 1
-
 [ $# -le 1 ] || { echo "Usage: validate_fallback_ifcs_xml [file to validate] (defaults to $FILENAME if not specified)" >&2 ; exit 2 ; }
 [ -z "$1" ] || FILENAME=$1
 

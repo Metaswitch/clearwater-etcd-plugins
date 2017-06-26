@@ -10,7 +10,6 @@
 local_site_name=site1
 etcd_key=clearwater
 . /etc/clearwater/config
-. /usr/share/clearwater/utils/check-root-permissions 1
 
 # Check we can contact `etcd`
 if ! nc -z ${management_local_ip:-$local_ip} 4000
