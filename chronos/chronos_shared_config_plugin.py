@@ -12,20 +12,20 @@ import logging
 import shutil
 import os
 
-_log = logging.getLogger("chronos_gr_config_plugin")
-_file = "/etc/chronos/chronos_gr.conf"
+_log = logging.getLogger("chronos_shared_config_plugin")
+_file = "/etc/chronos/chronos_shared.conf"
 _default_value = """\
-#####################################################################
-# No Chronos GR Config has been provided
-# Replace this file with the Chronos GR config for your deployment
-#####################################################################"""
+######################################################################
+# No Chronos shared Config has been provided
+# Replace this file with the Chronos shared config for your deployment
+######################################################################"""
 
-class ChronosGRConfigPlugin(ConfigPluginBase):
+class ChronosSharedConfigPlugin(ConfigPluginBase):
     def __init__(self, _params):
         pass
 
     def key(self): # pragma: no cover
-        return "chronos_gr_config"
+        return "chronos_shared_config"
 
     def file(self):
         return _file
@@ -45,11 +45,11 @@ class ChronosGRConfigPlugin(ConfigPluginBase):
             return FileStatus.MISSING
 
     def on_config_changed(self, value, alarm):
-        _log.info("Updating Chronos GR configuration file")
+        _log.info("Updating Chronos shared configuration file")
 
         if self.status(value) != FileStatus.UP_TO_DATE:
             safely_write(_file, value)
-            run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue add apply_chronos_gr_config")
+            run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue add apply_chronos_shared_config")
 
 def load_as_plugin(params): # pragma: no cover
-    return ChronosGRConfigPlugin(params)
+    return ChronosSharedConfigPlugin(params)
