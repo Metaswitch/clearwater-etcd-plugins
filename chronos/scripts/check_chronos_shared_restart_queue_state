@@ -13,7 +13,7 @@ local_site_name=site1
 
 if [ $# -ne 0 ]
 then
-  echo "Usage: check_chronos_gr_restart_queue_state"
+  echo "Usage: check_chronos_shared_restart_queue_state"
   exit 1
 fi
 
@@ -21,4 +21,4 @@ fi
   /usr/share/clearwater/clearwater-queue-manager/scripts/check_queue_state.py \
     "${management_local_ip:-$local_ip}" \
     "$local_site_name" \
-    "apply_chronos_gr_config"
+    "apply_chronos_shared_config"

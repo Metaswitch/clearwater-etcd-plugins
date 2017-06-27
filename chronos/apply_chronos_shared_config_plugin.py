@@ -10,9 +10,9 @@ from metaswitch.clearwater.etcd_shared.plugin_utils import run_command
 import logging
 import os
 
-_log = logging.getLogger("apply_chronos_gr_config_plugin")
+_log = logging.getLogger("apply_chronos_shared_config_plugin")
 
-class ApplyChronosGRConfigPlugin(QueuePluginBase):
+class ApplyChronosSharedConfigPlugin(QueuePluginBase):
     def __init__(self, _params):
         pass
 
@@ -30,7 +30,7 @@ class ApplyChronosGRConfigPlugin(QueuePluginBase):
                 "global")
 
     def key(self): # pragma: no cover
-        return "apply_chronos_gr_config"
+        return "apply_chronos_shared_config"
 
     def at_front_of_queue(self):
         _log.info("Restarting Chronos")
@@ -38,10 +38,10 @@ class ApplyChronosGRConfigPlugin(QueuePluginBase):
             _log.warning("Unable to stop Chronos successfully")
         if run_command("service chronos wait-sync"):
             _log.warning("Unable to resync Chronos successfully")
-        if run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue remove_success apply_chronos_gr_config"):
+        if run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue remove_success apply_chronos_shared_config"):
             _log.warning("Unable to remove this node from the resync queue")
         _log.info("Chronos restarted")
 
 
 def load_as_plugin(params): # pragma: no cover
-    return ApplyChronosGRConfigPlugin(params)
+    return ApplyChronosSharedConfigPlugin(params)
