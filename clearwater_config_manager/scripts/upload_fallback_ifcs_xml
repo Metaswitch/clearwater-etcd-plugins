@@ -67,7 +67,6 @@ fi
 
 rm -f /tmp/upload-fallback-ifcs-xml.stderr.$$ /tmp/upload-fallback-ifcs-xml.stdout.$$
 
-
 # Call the reload_fallback_ifc_xml scripts on this node
 /usr/share/clearwater/bin/reload_fallback_ifcs_xml
 
