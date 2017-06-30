@@ -42,7 +42,7 @@ class FallbackIFCsXMLPlugin(ConfigPluginBase):
             return FileStatus.MISSING
 
     def on_config_changed(self, value, alarm):
-        _log.info("Updating Fallback IFCs configuration file")
+        _log.info("Updating the fallback iFCs configuration file")
 
         if self.status(value) != FileStatus.UP_TO_DATE:
             safely_write(_file, value)

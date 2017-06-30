@@ -11,6 +11,7 @@ FILENAME=/etc/clearwater/shared_ifcs.xml
 SCHEMA=/usr/share/clearwater/clearwater-config-manager/scripts/config_validation/shared_ifcs_schema.xsd
 local_site_name=site1
 etcd_key=clearwater
+request_shared_ifcs=Y
 . /etc/clearwater/config
 
 . /usr/share/clearwater/utils/check-root-permissions 1
@@ -38,7 +39,7 @@ rc=$?
 
 # Check the return code and log if appropriate.
 if [ $rc != 0 ] ; then
-  echo The shared IFC file is invalid - unable to upload >&2
+  echo The shared iFC sets file is invalid - unable to upload >&2
   cat /tmp/upload-shared-ifcs-xml.stderr.$$              >&2
   rm -f /tmp/upload-shared-ifcs-xml.stderr.$$ /tmp/upload-shared-ifcs-xml.stdout.$$
   exit $rc
@@ -52,13 +53,17 @@ rc=$?
 
 # Check the return code and log if appropriate.
 if [ $rc != 0 ] ; then
-  echo Upload shared IFCs configuration failed to $keypath  >&2
+  echo Upload shared iFC sets configuration failed to $keypath  >&2
   cat /tmp/upload-shared-ifcs-xml.stderr.$$                 >&2
   cat /tmp/upload-shared-ifcs-xml.stdout.$$                 >&2
+else
+  if [ $request_shared_ifcs != "Y" ]; then
+    echo "Uploading shared iFC sets, but shared iFC sets aren't being requested from the HSS by this deployment. To enable shared iFC sets, set request_shared_ifcs=Y in /etc/clearwater/shared_config, and follow the documented process to modify Clearwater configuration"
+  fi
+
+  # Call the reload_shared_ifc_xml scripts on this node
+  /usr/share/clearwater/bin/reload_shared_ifcs_xml
 fi
 rm -f /tmp/upload-shared-ifcs-xml.stderr.$$ /tmp/upload-shared-ifcs-xml.stdout.$$
-
-# Call the reload_shared_ifc_xml scripts on this node
-/usr/share/clearwater/bin/reload_shared_ifcs_xml
 
 exit $rc

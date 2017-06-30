@@ -25,11 +25,11 @@ rc=$?
 
 # Check the return code and log if appropriate.
 if [ $rc != 0 ] ; then
-  echo Unable to remove the fallback IFCs                 >&2
+  echo Unable to remove the fallback iFCs configuration   >&2
   cat /tmp/remove-fallback-ifcs-xml.stderr.$$             >&2
   cat /tmp/remove-fallback-ifcs-xml.stdout.$$             >&2
 else
-  echo Fallback IFCs removed
+  echo The fallback iFCs configuration has been removed
 fi
 
 rm -f /tmp/remove-fallback-ifcs-xml.stderr.$$ /tmp/remove-fallback-ifcs-xml.stdout.$$
