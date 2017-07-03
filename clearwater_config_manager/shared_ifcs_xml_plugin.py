@@ -42,7 +42,7 @@ class SharedIFCsXMLPlugin(ConfigPluginBase):
             return FileStatus.MISSING
 
     def on_config_changed(self, value, alarm):
-        _log.info("Updating Shared IFCs configuration file")
+        _log.info("Updating the shared iFC sets configuration file")
 
         if self.status(value) != FileStatus.UP_TO_DATE:
             safely_write(_file, value)

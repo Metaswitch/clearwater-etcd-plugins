@@ -25,10 +25,10 @@ rc=$?
 
 # Check the return code and log if appropriate.
 if [ $rc != 0 ] ; then
-  echo The fallback IFC file is invalid                    >&2
+  echo The fallback iFCs configuration is invalid          >&2
   cat /tmp/validate-fallback-ifcs-xml.stderr.$$            >&2
 else
-  echo The fallback IFC file is valid
+  echo The fallback iFCs configuration is valid
 fi
 
 rm -f /tmp/validate-fallback-ifcs-xml.stderr.$$ /tmp/validate-fallback-ifcs-xml.stdout.$$
