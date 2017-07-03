@@ -11,7 +11,7 @@ FILENAME=/etc/clearwater/fallback_ifcs.xml
 SCHEMA=/usr/share/clearwater/clearwater-config-manager/scripts/config_validation/fallback_ifcs_schema.xsd
 local_site_name=site1
 etcd_key=clearwater
-apply_fallback_ifcs=Y
+apply_fallback_ifcs=N
 . /etc/clearwater/config
 
 . /usr/share/clearwater/utils/check-root-permissions 1
@@ -57,8 +57,9 @@ if [ $rc != 0 ] ; then
   cat /tmp/upload-fallback-ifcs-xml.stderr.$$                 >&2
   cat /tmp/upload-fallback-ifcs-xml.stdout.$$                 >&2
 else
+  echo "Successfully uploaded new fallback iFCs configuration."
   if [ $apply_fallback_ifcs != "Y" ]; then
-    echo "Uploading fallback iFCs, but fallback iFCs aren't being used by this deployment. To enable fallback iFCs, set apply_fallback_ifcs=Y in /etc/clearwater/shared_config, and follow the documented process to modify Clearwater configuration"
+    echo "Fallback iFCs aren't being applied by the S-CSCF in this deployment. If this isn't what you expect, and you want to enable fallback iFCs, set apply_fallback_ifcs=Y in /etc/clearwater/shared_config, and follow the documented process to modify Clearwater configuration."
   fi
 
   # Call the reload_fallback_ifc_xml scripts on this node
@@ -66,8 +67,5 @@ else
 fi
 
 rm -f /tmp/upload-fallback-ifcs-xml.stderr.$$ /tmp/upload-fallback-ifcs-xml.stdout.$$
-
-# Call the reload_fallback_ifc_xml scripts on this node
-/usr/share/clearwater/bin/reload_fallback_ifcs_xml
 
 exit $rc
