@@ -1,11 +1,11 @@
 {
-  "title": "All SCSCF servers",
+  "title": "All S-CSCF servers",
   "type": "object",
   "properties": {
     "s-cscfs": {
       "type": "array",
       "items": {
-        "title": "Each SCSCF server",
+        "title": "Each S-CSCF server",
         "type": "object",
         "properties": {
           "server": {
