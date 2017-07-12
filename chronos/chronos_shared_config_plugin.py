@@ -50,6 +50,7 @@ class ChronosSharedConfigPlugin(ConfigPluginBase):
         if self.status(value) != FileStatus.UP_TO_DATE:
             safely_write(_file, value)
             run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue add apply_chronos_shared_config")
+            alarm.update_file(self._file)
 
 def load_as_plugin(params): # pragma: no cover
     return ChronosSharedConfigPlugin(params)
