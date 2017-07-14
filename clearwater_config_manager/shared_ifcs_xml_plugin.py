@@ -47,7 +47,7 @@ class SharedIFCsXMLPlugin(ConfigPluginBase):
         if self.status(value) != FileStatus.UP_TO_DATE:
             safely_write(_file, value)
             run_command("/usr/share/clearwater/bin/reload_shared_ifcs_xml")
-            alarm.update_file(self._file)
+            alarm.update_file(_file)
 
 def load_as_plugin(params):  # pragma: no cover
     return SharedIFCsXMLPlugin(params)
