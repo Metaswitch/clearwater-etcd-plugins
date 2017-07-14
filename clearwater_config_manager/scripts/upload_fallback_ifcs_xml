@@ -46,6 +46,14 @@ if [ $rc != 0 ] ; then
 fi
 rm -f /tmp/upload-fallback-ifcs-xml.stderr.$$ /tmp/upload-fallback-ifcs-xml.stdout.$$
 
+uploadsize=500000
+filesize=$(wc -c <"$FILENAME")
+if [[ $filesize -ge $uploadsize ]]
+then
+  echo "The configuration file at $FILENAME is too large to upload (max size is $uploadsize bytes)"
+  exit 2
+fi
+
 # Upload the file to etcd
 keypath=http://${management_local_ip:-$local_ip}:4000/v2/keys/$etcd_key/$local_site_name/configuration/fallback_ifcs
 curl -X PUT $keypath --data-urlencode value@$FILENAME 2> /tmp/upload-fallback-ifcs-xml.stderr.$$ | tee /tmp/upload-fallback-ifcs-xml.stdout.$$ | egrep -q "\"action\":\"set\""
