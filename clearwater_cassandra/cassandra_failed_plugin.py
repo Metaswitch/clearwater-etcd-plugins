@@ -7,7 +7,7 @@
 
 from metaswitch.clearwater.cluster_manager.plugin_base import SynchroniserPluginBase
 from metaswitch.clearwater.etcd_shared.plugin_utils import run_command
-import subprocess
+import subprocess, shlex
 import logging
 
 _log = logging.getLogger("cassandra_failed_plugin")
@@ -54,10 +54,14 @@ class CassandraFailedPlugin(SynchroniserPluginBase):
         # We must remove the node from the cassandra cluster. Get the node's ID
         # from nodetool status, then remove it with nodetool remove
         try:
-            status_command = "nodetool status | grep " + self._ip
-            output = subprocess.check_output(in_sig_namespace(status_command),
-                                             shell=True,
-                                             stderr=subprocess.STDOUT)
+            process_nodetool = subprocess.Popen(shlex.split(in_sig_namespace('nodetool status')),
+                    stdout=subprocess.PIPE)
+            process_grep = subprocess.Popen(['grep', self._ip], 
+                    stdin=process_nodetool.stdout, stdout=subprocess.PIPE)
+
+            process_nodetool.stdout.close()
+            output = process_grep.communicate()[0]
+
             _log.debug("Nodetool status succeeded and printed output {!r}".
                        format(output))
         except subprocess.CalledProcessError:  # pragma: no coverage
