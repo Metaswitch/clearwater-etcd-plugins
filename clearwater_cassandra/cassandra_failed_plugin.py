@@ -47,15 +47,22 @@ class CassandraFailedPlugin(SynchroniserPluginBase):
         # namespace parameter to run_command.  This plugin does not have
         # access to the signaling namespace name, so we use this function
         # as a tactical workaround.
-        def in_sig_namespace(command):
-            prefix = "/usr/share/clearwater/bin/run-in-signaling-namespace "
-            return prefix + command
 
         # We must remove the node from the cassandra cluster. Get the node's ID
         # from nodetool status, then remove it with nodetool remove
+        output = get_node_list(self)
+        if output != "":
+            # Pull the UUID from the output
+            for value in output.split():
+                if "-" in value:
+                    remove_node(value)
+                    break
+
+    def get_node_list(self)
         try:
-            process_nodetool = subprocess.Popen(shlex.split(in_sig_namespace('nodetool status')),
-                    stdout=subprocess.PIPE)
+            args = ["/usr/share/clearwater/bin/run-in-signaling-namespace",
+                    "nodetool", "status"]
+            process_nodetool = subprocess.Popen(args, stdout=subprocess.PIPE)
             process_grep = subprocess.Popen(['grep', self._ip], 
                     stdin=process_nodetool.stdout, stdout=subprocess.PIPE)
 
@@ -66,11 +73,11 @@ class CassandraFailedPlugin(SynchroniserPluginBase):
                        format(output))
         except subprocess.CalledProcessError:  # pragma: no coverage
             _log.debug("hit error")
+            output = ""
 
-        if output != "":
-            # Pull the UUID from the output
-            for value in output.split():
-                if "-" in value:
-                    remove_command = "nodetool removenode " + value
-                    run_command(in_sig_namespace(remove_command))
-                    break
+        return output
+
+    def remove_node(node_ip):
+        remove_command = "nodetool removenode " + node_ip
+        run_command(remove_command, "signaling")
+
