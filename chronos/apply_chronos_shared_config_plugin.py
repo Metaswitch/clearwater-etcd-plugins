@@ -34,11 +34,12 @@ class ApplyChronosSharedConfigPlugin(QueuePluginBase):
 
     def at_front_of_queue(self):
         _log.info("Restarting Chronos")
-        if run_command("service chronos stop"):
+        if run_command(["service", "chronos", "stop"]):
             _log.warning("Unable to stop Chronos successfully")
-        if run_command("service chronos wait-sync"):
+        if run_command(["service", "chronos", "wait-sync"]):
             _log.warning("Unable to resync Chronos successfully")
-        if run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue remove_success apply_chronos_shared_config"):
+        if run_command(["/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue", 
+            "remove_success", "apply_chronos_shared_config"]):
             _log.warning("Unable to remove this node from the resync queue")
         _log.info("Chronos restarted")
 

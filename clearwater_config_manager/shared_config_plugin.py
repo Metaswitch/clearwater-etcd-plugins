@@ -53,7 +53,8 @@ class SharedConfigPlugin(ConfigPluginBase):
             safely_write(_file, value)
             if value != _default_value:
                 apply_config_key = subprocess.check_output(["/usr/share/clearwater/clearwater-queue-manager/scripts/get_apply_config_key"])
-                run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue add {}".format(apply_config_key))
+                run_command(["/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue", 
+                    "add", apply_config_key])
             alarm.update_file(_file)
 
 def load_as_plugin(params):  # pragma: no cover

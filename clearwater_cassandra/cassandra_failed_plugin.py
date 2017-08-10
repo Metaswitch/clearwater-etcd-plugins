@@ -60,6 +60,6 @@ class CassandraFailedPlugin(SynchroniserPluginBase):
             # Pull the UUID from the output
             for value in output.split():
                 if "-" in value:
-                    remove_command = "nodetool removenode " + value
-                    run_command(remove_command, "signaling")
+                    remove_command = ["/usr/share/clearwater/bin/run-in-signaling-namespace", "nodetool", "removenode", value]
+                    run_command(remove_command)
                     break

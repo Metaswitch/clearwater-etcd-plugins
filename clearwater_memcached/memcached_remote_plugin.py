@@ -56,7 +56,7 @@ class RemoteMemcachedPlugin(SynchroniserPluginBase):
         if self._remote_site != "":
             write_memcached_cluster_settings("/etc/clearwater/remote_cluster_settings",
                                              cluster_view)
-            run_command("/usr/share/clearwater/bin/reload_memcached_users")
+            run_command(["/usr/share/clearwater/bin/reload_memcached_users"])
 
 
 def load_as_plugin(params):  # pragma: no cover
