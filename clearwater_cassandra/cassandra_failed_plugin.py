@@ -38,26 +38,19 @@ class CassandraFailedPlugin(SynchroniserPluginBase):
         pass
 
     def on_leaving_cluster(self, cluster_view):
+        # We must remove the node from the cassandra cluster.
+        self.remove_node()
 
-        # Cassandra commands need to be run in the signaling network
-        # namespace in split network systems.
-        #
-        # This function means that there are now two ways of running a
-        # command in the signaling namespace - this function, and the
-        # namespace parameter to run_command.  This plugin does not have
-        # access to the signaling namespace name, so we use this function
-        # as a tactical workaround.
-        def in_sig_namespace(command):
-            prefix = "/usr/share/clearwater/bin/run-in-signaling-namespace "
-            return prefix + command
-
-        # We must remove the node from the cassandra cluster. Get the node's ID
-        # from nodetool status, then remove it with nodetool remove
+    def remove_node(self):   # pragma: no cover
         try:
-            status_command = "nodetool status | grep " + self._ip
-            output = subprocess.check_output(in_sig_namespace(status_command),
-                                             shell=True,
-                                             stderr=subprocess.STDOUT)
+            args = ["/usr/share/clearwater/bin/run-in-signaling-namespace",
+                    "nodetool", "status"]
+            process_nodetool = subprocess.Popen(args, stdout=subprocess.PIPE)
+            process_grep = subprocess.Popen(['grep', self._ip], 
+                    stdin=process_nodetool.stdout, stdout=subprocess.PIPE)
+
+            process_nodetool.stdout.close()
+            output = process_grep.communicate()[0]
             _log.debug("Nodetool status succeeded and printed output {!r}".
                        format(output))
         except subprocess.CalledProcessError:  # pragma: no coverage
@@ -67,6 +60,6 @@ class CassandraFailedPlugin(SynchroniserPluginBase):
             # Pull the UUID from the output
             for value in output.split():
                 if "-" in value:
-                    remove_command = "nodetool removenode " + value
-                    run_command(in_sig_namespace(remove_command))
+                    remove_command = ["/usr/share/clearwater/bin/run-in-signaling-namespace", "nodetool", "removenode", value]
+                    run_command(remove_command)
                     break

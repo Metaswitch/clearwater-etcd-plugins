@@ -41,6 +41,6 @@ class SproutJsonPlugin(ConfigPluginBase):
 
         safely_write(self._file, value)
 
-        run_command("service sprout reload")
+        run_command(["service", "sprout", "reload"])
 
         alarm.update_file(self._file)

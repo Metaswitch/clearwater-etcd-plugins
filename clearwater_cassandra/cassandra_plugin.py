@@ -76,7 +76,7 @@ class CassandraPlugin(SynchroniserPluginBase):
 
         if (self._ip == sorted(cluster_view.keys())[0]):
             _log.debug("Adding schemas")
-            run_command("/usr/share/clearwater/infrastructure/scripts/cassandra_schemas/run_cassandra_schemas")
+            run_command(["/usr/share/clearwater/infrastructure/scripts/cassandra_schemas/run_cassandra_schemas"])
 
     def on_leaving_cluster(self, cluster_view):
         decommission_alarm = alarm_manager.get_alarm(
@@ -135,7 +135,8 @@ class CassandraPlugin(SynchroniserPluginBase):
         #
         # We do not want to kill cassandra if it is in the process of bootstrapping
         if not os.path.exists(self.BOOTSTRAP_IN_PROGRESS_FLAG):
-            run_command("start-stop-daemon -K -p /var/run/cassandra/cassandra.pid -R TERM/30/KILL/5")
+            run_command(["start-stop-daemon", "-K", "-p",
+                "/var/run/cassandra/cassandra.pid", "-R", "TERM/30/KILL/5"])
             _log.info("Stopped Cassandra while changing config files")
 
         # We only want to perform these steps the first time we join a cluster
@@ -145,9 +146,9 @@ class CassandraPlugin(SynchroniserPluginBase):
             ((os.path.exists(self.BOOTSTRAPPED_FLAG) or
              (os.path.exists(self.BOOTSTRAP_IN_PROGRESS_FLAG))))):
             _log.warn("Deleting /var/lib/cassandra - this is normal on initial clustering")
-            run_command("rm -rf /var/lib/cassandra/")
-            run_command("mkdir -m 755 /var/lib/cassandra")
-            run_command("chown -R cassandra /var/lib/cassandra")
+            run_command(["rm", "-rf", "/var/lib/cassandra/"])
+            run_command(["mkdir", "-m", "755", "/var/lib/cassandra"])
+            run_command(["chown", "-R", "cassandra", "/var/lib/cassandra"])
 
             # Set a state flag if we have performed a destructive restart, and not yet
             # completed bootstrapping. This will stop us re-deleting the data directory
@@ -200,7 +201,8 @@ class CassandraPlugin(SynchroniserPluginBase):
             pass
 
     def can_contact_cassandra(self):
-        rc = run_command("/usr/share/clearwater/bin/poll_cassandra.sh --no-grace-period", log_error=False)
+        rc = run_command(["/usr/share/clearwater/bin/poll_cassandra.sh",
+            "--no-grace-period"], log_error=False)
         return (rc == 0)
 
     def leave_cassandra_cluster(self):
@@ -215,7 +217,7 @@ class CassandraPlugin(SynchroniserPluginBase):
         if os.path.exists(self.CASSANDRA_YAML_FILE):
             os.remove(self.CASSANDRA_YAML_FILE)
 
-        run_command("nodetool decommission", self._sig_namespace)
+        run_command(["nodetool", "decommission"], self._sig_namespace)
 
         # Remove the bootstrapping flags so that we bootstrap correctly
         # if rejoining the cluster again in future.
@@ -242,7 +244,7 @@ class CassandraPlugin(SynchroniserPluginBase):
         _log.info("Finished waiting for Cassandra to come up")
         # Restart clearwater-infrastructure so any necessary schema creation
         # scripts get run
-        run_command("sudo service clearwater-infrastructure restart")
+        run_command(["sudo", "service", "clearwater-infrastructure", "restart"])
 
 
 def load_as_plugin(params):  # pragma: no cover

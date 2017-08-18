@@ -24,24 +24,28 @@ class ApplyConfigPlugin(QueuePluginBase):
 
     def at_front_of_queue(self):
         _log.info("Restarting clearwater-infrastructure")
-        run_command("service clearwater-infrastructure restart")
+        run_command(["service", "clearwater-infrastructure", "restart"])
 
         if os.path.exists("/usr/share/clearwater/infrastructure/scripts/restart"):
             _log.info("Restarting services")
             for restart_script in os.listdir("/usr/share/clearwater/infrastructure/scripts/restart"):
-                run_command("/usr/share/clearwater/infrastructure/scripts/restart/" + restart_script)
+                run_command(["/usr/share/clearwater/infrastructure/scripts/restart/"
+                    + restart_script])
  
         if self._wait_plugin_complete != "N":
             _log.info("Checking service health")
-            if run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/check_node_health.py"):
+            if run_command(["/usr/share/clearwater/clearwater-queue-manager/scripts/check_node_health.py"]):
                 _log.info("Services failed to restart successfully")
-                run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue remove_failure {}".format(self._key))
+                run_command(["/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue",
+                "remove_failure", self._key])
             else:
                 _log.info("Services restarted successfully")
-                run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue remove_success {}".format(self._key))
+                run_command(["/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue",
+                "remove_success", self._key])
         else:
             _log.info("Not checking service health")
-            run_command("/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue remove_success {}".format(self._key))
+            run_command(["/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue",
+            "remove_success", self._key])
 
 def load_as_plugin(params):  # pragma: no cover
     return ApplyConfigPlugin(params)

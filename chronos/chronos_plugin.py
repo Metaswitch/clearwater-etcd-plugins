@@ -88,8 +88,8 @@ class ChronosPlugin(SynchroniserPluginBase):
 
     def on_new_cluster_config_ready(self, cluster_view):  # pragma: no cover
         self._alarm.set()
-        run_command("service chronos resync")
-        run_command("service chronos wait-sync")
+        run_command(["service", "chronos", "resync"])
+        run_command(["service", "chronos", "wait-sync"])
 
     def on_stable_cluster(self, cluster_view):  # pragma: no cover
         self.write_cluster_settings(cluster_view)
@@ -105,7 +105,7 @@ class ChronosPlugin(SynchroniserPluginBase):
                                        self.local_server,
                                        self.instance_id,
                                        self.deployment_id)
-        run_command("service chronos reload")
+        run_command(["service", "chronos", "reload"])
 
 def load_as_plugin(params):  # pragma: no cover
     _log.info("Loading the Chronos plugin")

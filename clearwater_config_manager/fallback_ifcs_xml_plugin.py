@@ -46,7 +46,7 @@ class FallbackIFCsXMLPlugin(ConfigPluginBase):
 
         if self.status(value) != FileStatus.UP_TO_DATE:
             safely_write(_file, value)
-            run_command("/usr/share/clearwater/bin/reload_fallback_ifcs_xml")
+            run_command(["/usr/share/clearwater/bin/reload_fallback_ifcs_xml"])
             alarm.update_file(_file)
 
 def load_as_plugin(params):  # pragma: no cover
