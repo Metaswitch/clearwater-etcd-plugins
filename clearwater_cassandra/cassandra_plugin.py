@@ -202,7 +202,6 @@ class CassandraPlugin(SynchroniserPluginBase):
     def can_contact_cassandra(self):
         rc = run_command(["/usr/share/clearwater/bin/poll_cassandra.sh",
             "--no-grace-period"], log_error=False)
-
         return (rc == 0)
 
     def leave_cassandra_cluster(self):
