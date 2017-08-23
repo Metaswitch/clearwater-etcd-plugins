@@ -75,8 +75,7 @@ class CassandraPlugin(SynchroniserPluginBase):
         pdlogs.STABLE_CLUSTER.log(cluster_desc=self.cluster_description())
 
         if (self._ip == sorted(cluster_view.keys())[0]):
-            _log.debug("Adding schemas")
-            run_command(["/usr/share/clearwater/infrastructure/scripts/cassandra_schemas/run_cassandra_schemas"])
+            self.add_cassandra_schemas()
 
     def on_leaving_cluster(self, cluster_view):
         decommission_alarm = alarm_manager.get_alarm(
@@ -203,6 +202,7 @@ class CassandraPlugin(SynchroniserPluginBase):
     def can_contact_cassandra(self):
         rc = run_command(["/usr/share/clearwater/bin/poll_cassandra.sh",
             "--no-grace-period"], log_error=False)
+
         return (rc == 0)
 
     def leave_cassandra_cluster(self):
@@ -246,6 +246,25 @@ class CassandraPlugin(SynchroniserPluginBase):
         # scripts get run
         run_command(["sudo", "service", "clearwater-infrastructure", "restart"])
 
+    def add_cassandra_schemas(self):  # pragma: no cover
+        # Adding the schemas can fail when Cassandra has just started. If it
+        # does fail, simply try again until it succeeds.
+        _log.info("Trying to add/update the Cassandra schemas...")
+        attempts = 0;
+
+        while True:
+            rc = run_command(["/usr/share/clearwater/infrastructure/scripts/cassandra_schemas/run_cassandra_schemas"])
+
+            if rc == 0:
+                break
+
+            time.sleep(1)
+            attempts += 1
+
+            if ((attempts % 10) == 0):
+                _log.info("Still trying to add/update the Cassandra schemas...")
+
+        _log.info("Finished adding/updating the schemas")
 
 def load_as_plugin(params):  # pragma: no cover
     return CassandraPlugin(params)
