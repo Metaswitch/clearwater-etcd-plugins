@@ -113,6 +113,24 @@ class CassandraPlugin(SynchroniserPluginBase):
         doc["range_request_timeout_in_ms"] = 190
         doc["write_request_timeout_in_ms"] = 190
 
+        # Commit logs.  We want to cap these, as the default of 8GB is sufficient
+        # to exhaust the root filesystem on a low-spec (20GB) node, but we should
+        # allow higher spec machines to use more diskspace to avoid thrashing.
+        #
+        # Therefore, set the upper threshold for commit logs to be 1GB per core
+        # (up to the maximum for a 64bit machine - namely 8192).
+        get_core_count = "grep processor /proc/cpuinfo | wc -l"
+        core_count = subprocess.check_output(get_core_count,
+                                             shell=True,
+                                             stderr=subprocess.STDOUT)
+
+        try:
+            core_count_int = int(core_count)
+        except ValueError:  #  pragma: no cover
+            core_count_int = 2
+
+        doc["commitlog_total_space_in_mb"] = min(core_count_int * 1024, 8192)
+
         contents = WARNING_HEADER + "\n" + yaml.dump(doc)
         topology = WARNING_HEADER + "\n" + "dc={}\nrack=RAC1\n".format(self._local_site)
 
