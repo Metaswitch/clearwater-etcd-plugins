@@ -119,10 +119,14 @@ class CassandraPlugin(SynchroniserPluginBase):
         #
         # Therefore, set the upper threshold for commit logs to be 1GB per core
         # (up to the maximum for a 64bit machine - namely 8192).
+        #
+        # We ignore security analysis here, as although we are shelling out,
+        # we are doing so with a fixed command, so it's safe to do so. For
+        # safety, we always force the result to be an integer.
         get_core_count = "grep processor /proc/cpuinfo | wc -l"
         core_count = subprocess.check_output(get_core_count,
                                              shell=True,
-                                             stderr=subprocess.STDOUT)
+                                             stderr=subprocess.STDOUT) # nosec
 
         try:
             core_count_int = int(core_count)
