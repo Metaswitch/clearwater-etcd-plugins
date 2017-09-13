@@ -124,9 +124,9 @@ class CassandraPlugin(SynchroniserPluginBase):
         # we are doing so with a fixed command, so it's safe to do so. For
         # safety, we always force the result to be an integer.
         get_core_count = "grep processor /proc/cpuinfo | wc -l"
-        core_count = subprocess.check_output(get_core_count,
+        core_count = subprocess.check_output(get_core_count, # nosec
                                              shell=True,
-                                             stderr=subprocess.STDOUT) # nosec
+                                             stderr=subprocess.STDOUT)
 
         try:
             core_count_int = int(core_count)
