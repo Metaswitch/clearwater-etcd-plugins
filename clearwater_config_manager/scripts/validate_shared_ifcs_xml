@@ -26,7 +26,7 @@ rc=$?
 # Check the return code and log if appropriate.
 if [ $rc != 0 ] ; then
   echo The shared iFC sets file is invalid.                        >&2
-  cat /tmp/upload-shared-ifcs-xml.stderr.$$ | grep -v "Loaded URL" >&2
+  cat /tmp/validate-shared-ifcs-xml.stderr.$$ | grep -v "Loaded URL" >&2
 else
   echo The shared iFC sets configuration is valid.
 fi
