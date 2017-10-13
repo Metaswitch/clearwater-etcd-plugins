@@ -6,7 +6,6 @@ class WeatherwaxConfig(ConfigType):
     scripts = []  # no validation
     name = 'weatherwax_config'
     uploadfile = 'upload_weatherwax_config'
-    configfile = '/etc/clearwater/weatherwax_config'
     help_info = 'weatherwax_config is for '  # TODO
 
 
