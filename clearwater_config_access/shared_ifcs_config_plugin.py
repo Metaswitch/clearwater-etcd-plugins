@@ -10,7 +10,6 @@ class SharedIfcsXml(ConfigType):
                  'that are common to many subscribers. This is identified by a'
                  'Shared iFC set ID ')
     filetype = 'xml'
-    scripts = self.script_finder_xml()  # how to call schema
 
 
 def load_as_plugin(params):
