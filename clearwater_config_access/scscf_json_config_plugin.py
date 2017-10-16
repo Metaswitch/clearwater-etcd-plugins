@@ -1,6 +1,6 @@
 
 
-from configtype_plugin import ConfigType
+from metaswitch.clearwater.config_manager.config_type_class_plugin import ConfigType
 
 
 class ScscfJson(ConfigType):

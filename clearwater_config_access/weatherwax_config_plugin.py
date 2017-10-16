@@ -1,5 +1,5 @@
 """This contains the weatherwax subclass of ConfigType"""
-from configtype_plugin import ConfigType
+from metaswitch.clearwater.config_manager.config_type_class_plugin import ConfigType
 
 
 class WeatherwaxConfig(ConfigType):
