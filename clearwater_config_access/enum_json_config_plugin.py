@@ -9,7 +9,6 @@ class EnumJson(ConfigType):
     call_general = '/usr/share/clearwater/clearwater-config-manager/scripts/validate_json.py'
     uploadfile = 'upload_enum_json'
     filetype = 'json'
-    scripts = self.script_finder_json()
     help_info = ('enum.json is for storing dialled telephone numbers into '
                  'internet addresses(URI)')
 

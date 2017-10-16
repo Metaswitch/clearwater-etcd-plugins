@@ -8,7 +8,6 @@ class BgcfJson(ConfigType):
     call_general = '/usr/share/clearwater/clearwater-config-manager/scripts/validate_json.py'
     uploadfile = 'upload_bgcf_json'
     filetype = 'json'
-    scripts = self.script_finder_json()
     help_info = ('bgcf_json stores the system configuration of BGCF and '
                  'defines how your deployment will handle calls that are '
                  'routed to the BGCF')

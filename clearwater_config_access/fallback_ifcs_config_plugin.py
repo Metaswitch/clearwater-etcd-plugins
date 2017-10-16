@@ -10,7 +10,6 @@ class FallbackIfcsXml(ConfigType):
                  'iFCs that should be used if no relevant iFC can be found for'
                  'a subscriber')
     filetype = 'xml'
-    scripts = self.script_finder_xml()  # how to call schema
 
 
 def load_as_plugin(params):
