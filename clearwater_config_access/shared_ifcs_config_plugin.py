@@ -9,7 +9,8 @@ class SharedIfcsXml(ConfigType):
     help_info = ('shared_ifcs is the shared_ifcs.xml this is a list of iFCs'
                  'that are common to many subscribers. This is identified by a'
                  'Shared iFC set ID ')
-    scripts = script_finder_xml()  # how to call schema
+    xml = True
+    scripts = self.script_finder_xml()  # how to call schema
 
 
 def load_as_plugin(params):

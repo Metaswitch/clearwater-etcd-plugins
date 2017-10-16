@@ -9,7 +9,8 @@ class FallbackIfcsXml(ConfigType):
     help_info = ('fallback_ifcs is the fallback_ifcs.xml this is a list of'
                  'iFCs that should be used if no relevant iFC can be found for'
                  'a subscriber')
-    scripts = script_finder_xml()  # how to call schema
+    xml = True
+    scripts = self.script_finder_xml()  # how to call schema
 
 
 def load_as_plugin(params):

@@ -8,7 +8,8 @@ class ScscfJson(ConfigType):
     name = 's-cscf_json'
     call_general = '/usr/share/clearwater/clearwater-config-manager/scripts/validate_json.py'
     uploadfile = 'upload_scscf_json'
-    scripts = script_finder_json()
+    json = True
+    scripts = self.script_finder_json()
     help_info = ('s-cscf_json stores the the configuration, capabilities, '
                  'relative weightings and priority of each S-CSCF '
                  'configuration')
