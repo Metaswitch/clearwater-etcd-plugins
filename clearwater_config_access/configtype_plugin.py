@@ -24,18 +24,19 @@ class ConfigType:
             # the user all of the problems with their config changes, so don't
             # bail out of the loop at this point, just record which scripts
             # have failed.
-            failed_scripts.append(script)
+                failed_scripts.append(script)
 
         return failed_scripts
 
     def script_finder_json(self):
-        scripts = [['python', self.call_general, self.schema, self.configfile], ]
+        scripts = [['python', self.call_general, self.schema,
+                    self.configfile], ]
         return scripts
 
     def script_finder_xml(self):
-        scripts = [['xmllint', '--format', '--pretty 1', '--load-trace',
+        scripts = [['xmllint', '--format', '--pretty', '1', '--load-trace',
                     '--debug', '--schema', '${}'.format(self.schema),
-                    '${}'.format(self.configfile)],]
+                    '${}'.format(self.configfile)], ]
 
     def __str__(self):
         return self.name

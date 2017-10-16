@@ -8,7 +8,8 @@ class DnsJson(ConfigType):
     call_general = '/usr/share/clearwater/clearwater-config-manager/scripts/validate_json.py'
     uploadfile = 'upload_dns_json'
     scripts = script_finder_json()
-    help_info = 'dns_json is for '  # TODO
+    help_info = ('dns_json sets up DNS overrides to CNAME records so that you'
+                 ' can use a single hostname across the deployment')
 
 
 def load_as_plugin(params):
