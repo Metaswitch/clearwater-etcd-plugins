@@ -1,4 +1,4 @@
-
+"""The contains the shared config subclass of config type"""
 from metaswitch.clearwater.config_manager.config_type_class_plugin import ConfigType
 
 
