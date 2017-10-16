@@ -8,6 +8,7 @@ class SharedConfig(ConfigType):
     # this allows users to edit it too
     name = 'shared_config'
     uploadfile = 'upload_shared_config'
+    filetype = 'shared'
     help_info = ('shared_config contains core options(required in most'
                  ' clearwater deployments), advanced options(optional settings'
                  ' whose needs depend on the deployment configuration), and '
