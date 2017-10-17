@@ -3,12 +3,9 @@ from metaswitch.clearwater.config_manager.config_type_class_plugin import Config
 
 
 class SharedConfig(ConfigType):
-    scripts = []  # this does have validation TODO
-    # make it run through all files in directory where shared config is
-    # this allows users to edit it too
     name = 'shared_config'
     uploadfile = 'upload_shared_config'
-    filetype = 'shared'
+    filetype = 'shared_config'
     help_info = ('shared_config contains core options(required in most'
                  ' clearwater deployments), advanced options(optional settings'
                  ' whose needs depend on the deployment configuration), and '
