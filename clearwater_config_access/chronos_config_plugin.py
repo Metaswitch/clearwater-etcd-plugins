@@ -3,10 +3,10 @@ from metaswitch.clearwater.config_manager.config_type_class_plugin import Config
 
 
 class ChronosSharedConfig(ConfigType):
-    scripts = []  # no validation
     name = 'chronos_shared'
     filetype = 'chronos'
-    uploadfile = 'upload_chronos_shared_config'
+    # This help_info is used in arg-parsing to give the user some more
+    # information on the config files that are available
     help_info = ('chronos_config is the chronos_shared.conf this is for'
                  'configuration options that control how the Chronos cluster '
                  'in the local site connects to other clusters for geographic'

@@ -3,9 +3,11 @@ from metaswitch.clearwater.config_manager.config_type_class_plugin import Config
 
 
 class SharedConfig(ConfigType):
+    """This is the subclass describing shared_config"""
     name = 'shared_config'
-    uploadfile = 'upload_shared_config'
     filetype = 'shared_config'
+    # This help_info is used in arg-parsing to give the user some more
+    # information on the config files that are available
     help_info = ('shared_config contains core options(required in most'
                  ' clearwater deployments), advanced options(optional settings'
                  ' whose needs depend on the deployment configuration), and '
