@@ -13,8 +13,8 @@ from metaswitch.clearwater.config_manager.config_type_class_plugin import Config
 class FallbackIfcsXml(ConfigType):
     name = 'fallback_ifcs'
     filetype = 'xml'
-    # This help_info is used in arg-parsing to give the user some more
-    # information on the config files that are available
+    # This help_info appears as user-visible help text in the usage statement
+    # for cw-config.
     help_info = ('fallback_ifcs is the fallback_ifcs.xml this is a list of'
                  'iFCs that should be used if no relevant iFC can be found for'
                  'a subscriber')

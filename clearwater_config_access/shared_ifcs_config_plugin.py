@@ -12,8 +12,8 @@ from metaswitch.clearwater.config_manager.config_type_class_plugin import Config
 class SharedIfcsXml(ConfigType):
     name = 'shared_ifcs'
     filetype = 'xml'
-    # This help_info is used in arg-parsing to give the user some more
-    # information on the config files that are available
+    # This help_info appears as user-visible help text in the usage statement
+    # for cw-config.
     help_info = ('shared_ifcs is the shared_ifcs.xml this is a list of iFCs'
                  'that are common to many subscribers. This is identified by a'
                  'Shared iFC set ID ')

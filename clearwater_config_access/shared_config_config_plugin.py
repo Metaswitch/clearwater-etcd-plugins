@@ -13,8 +13,8 @@ class SharedConfig(ConfigType):
     """This is the subclass describing shared_config"""
     name = 'shared_config'
     filetype = 'shared_config'
-    # This help_info is used in arg-parsing to give the user some more
-    # information on the config files that are available
+    # This help_info appears as user-visible help text in the usage statement
+    # for cw-config.
     help_info = ('shared_config contains core options(required in most'
                  ' clearwater deployments), advanced options(optional settings'
                  ' whose needs depend on the deployment configuration), and '
