@@ -10,8 +10,11 @@ from metaswitch.clearwater.config_manager.config_type_class_plugin import Config
 
 
 class BgcfJson(ConfigType):
-    name = 'bgcf_json'
+    name = 'bgcf'
     filetype = 'json'
+    # filename is used to agree with the current naming system when finding or
+    # writing to files
+    filename = 'bgcf.json'
     # This help_info appears as user-visible help text in the usage statement
     # for cw-config.
     help_info = ('bgcf_json stores the system configuration of BGCF and '

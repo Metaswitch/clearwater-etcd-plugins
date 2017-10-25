@@ -11,8 +11,11 @@ from metaswitch.clearwater.config_manager.config_type_class_plugin import Config
 
 
 class ScscfJson(ConfigType):
-    name = 's-cscf_json'
+    name = 's-cscf'
     filetype = 'json'
+    # filename is used to agree with the current naming system when finding or
+    # writing to files
+    filename = 's-cscf.json'
     # This help_info appears as user-visible help text in the usage statement
     # for cw-config.
     help_info = ('s-cscf_json stores the the configuration, capabilities, '

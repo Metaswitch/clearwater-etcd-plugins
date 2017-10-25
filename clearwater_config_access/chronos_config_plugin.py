@@ -11,11 +11,14 @@ from metaswitch.clearwater.config_manager.config_type_class_plugin import Config
 
 
 class ChronosSharedConfig(ConfigType):
-    name = 'chronos_shared'
+    name = 'chronos'
     filetype = 'chronos'
+    # filename is used to agree with the current naming system when finding or
+    # writing to files
+    filename = 'chronos_shared.conf'
     # This help_info appears as user-visible help text in the usage statement
     # for cw-config.
-    help_info = ('chronos_config is the chronos_shared.conf this is for'
+    help_info = ('chronos is the chronos_shared.conf this is for'
                  'configuration options that control how the Chronos cluster '
                  'in the local site connects to other clusters for geographic'
                  'redundancy. If you have a single site deployment, this file'

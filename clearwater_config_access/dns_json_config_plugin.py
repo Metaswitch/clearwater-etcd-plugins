@@ -11,8 +11,11 @@ from metaswitch.clearwater.config_manager.config_type_class_plugin import Config
 
 
 class DnsJson(ConfigType):
-    name = 'dns_json'
+    name = 'dns'
     filetype = 'json'
+    # filename is used to agree with the current naming system when finding or
+    # writing to files
+    filename = 'dns.json'
     # This help_info appears as user-visible help text in the usage statement
     # for cw-config.
     help_info = ('dns_json sets up DNS overrides to CNAME records so that you'

@@ -13,6 +13,9 @@ from metaswitch.clearwater.config_manager.config_type_class_plugin import Config
 class FallbackIfcsXml(ConfigType):
     name = 'fallback_ifcs'
     filetype = 'xml'
+    # filename is used to agree with the current naming system when finding or
+    # writing to files
+    filename = 'fallback_ifcs.xml'
     # This help_info appears as user-visible help text in the usage statement
     # for cw-config.
     help_info = ('fallback_ifcs is the fallback_ifcs.xml this is a list of'
