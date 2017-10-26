@@ -13,9 +13,11 @@ from metaswitch.clearwater.config_manager.config_type_class_plugin import Config
 class ChronosSharedConfig(ConfigType):
     name = 'chronos'
     filetype = 'chronos'
-    # filename is used to agree with the current naming system when finding or
-    # writing to files
-    filename = 'chronos_shared.conf'
+    # file_download_name is used to agree with the current naming system when
+    # writing to file.
+    file_download_name = 'chronos_shared.conf'
+    # file_etcd_name is the name to find the config file in clearwater-etcd
+    file_etcd_name = 'chronos_shared_config'
     # This help_info appears as user-visible help text in the usage statement
     # for cw-config.
     help_info = ('chronos is the chronos_shared.conf this is for'

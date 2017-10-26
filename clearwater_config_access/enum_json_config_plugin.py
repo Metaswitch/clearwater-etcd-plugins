@@ -13,9 +13,11 @@ from metaswitch.clearwater.config_manager.config_type_class_plugin import Config
 class EnumJson(ConfigType):
     name = 'enum'
     filetype = 'json'
-    # filename is used to agree with the current naming system when finding or
-    # writing to files
-    filename = 'enum.json'
+    # file_download_name is used to agree with the current naming system when
+    # writing to file.
+    file_download_name = 'enum.json'
+    # file_etcd_name is the name to find the config file in clearwater-etcd
+    file_etcd_name = 'enum_json'
     # This help_info appears as user-visible help text in the usage statement
     # for cw-config.
     help_info = ('enum.json is for storing dialled telephone numbers into '

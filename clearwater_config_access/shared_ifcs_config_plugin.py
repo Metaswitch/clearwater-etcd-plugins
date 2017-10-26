@@ -12,9 +12,11 @@ from metaswitch.clearwater.config_manager.config_type_class_plugin import Config
 class SharedIfcsXml(ConfigType):
     name = 'shared_ifcs'
     filetype = 'xml'
-    # filename is used to agree with the current naming system when finding or
-    # writing to files
-    filename = 'shared_ifcs.xml'
+    # file_download_name is used to agree with the current naming system when
+    # writing to file.
+    file_download_name = 'shared_ifcs.xml'
+    # file_etcd_name is the name to find the config file in clearwater-etcd
+    file_etcd_name = 'shared_ifcs'
     # This help_info appears as user-visible help text in the usage statement
     # for cw-config.
     help_info = ('shared_ifcs is the shared_ifcs.xml this is a list of iFCs'

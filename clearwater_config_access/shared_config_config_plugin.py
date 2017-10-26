@@ -13,9 +13,11 @@ class SharedConfig(ConfigType):
     """This is the subclass describing shared_config"""
     name = 'shared_config'
     filetype = 'shared_config'
-    # filename is used to agree with the current naming system when finding or
-    # writing to files
-    filename = 'shared_config'
+    # file_download_name is used to agree with the current naming system when
+    # writing to file.
+    file_download_name = 'shared_config'
+    # file_etcd_name is the name to find the config file in clearwater-etcd
+    file_etcd_name = 'shared_config'
     # This help_info appears as user-visible help text in the usage statement
     # for cw-config.
     help_info = ('shared_config contains core options(required in most'
