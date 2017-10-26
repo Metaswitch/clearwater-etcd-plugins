@@ -16,13 +16,11 @@ class FallbackIfcsXml(ConfigType):
     # file_download_name is used to agree with the current naming system when
     # writing to file.
     file_download_name = 'fallback_ifcs.xml'
-    # file_etcd_name is the name to find the config file in clearwater-etcd
-    file_etcd_name = 'fallback_ifcs'
+
     # This help_info appears as user-visible help text in the usage statement
     # for cw-config.
-    help_info = ('fallback_ifcs is the fallback_ifcs.xml this is a list of'
-                 'iFCs that should be used if no relevant iFC can be found for'
-                 'a subscriber')
+    help_info = ('fallback_ifcs is the fallback_ifcs.xml this are used if no '
+                 'relevant iFC can be found for a subscriber. \n')
     schema = '/usr/share/clearwater/clearwater-config-manager/scripts/config_validation/fallback_ifcs_schema.xsd'
 
 

@@ -16,15 +16,10 @@ class SharedConfig(ConfigType):
     # file_download_name is used to agree with the current naming system when
     # writing to file.
     file_download_name = 'shared_config'
-    # file_etcd_name is the name to find the config file in clearwater-etcd
-    file_etcd_name = 'shared_config'
     # This help_info appears as user-visible help text in the usage statement
     # for cw-config.
-    help_info = ('shared_config contains core options(required in most'
-                 ' clearwater deployments), advanced options(optional settings'
-                 ' whose needs depend on the deployment configuration), and '
-                 'OAN configuration(only required if One-time-password access '
-                 'Nodes are being deployed)')
+    help_info = ('shared_config contains core options, advanced options, and '
+                 'OAN configuration. \n')
 
 def load_as_plugin(params):
     return SharedConfig(params)

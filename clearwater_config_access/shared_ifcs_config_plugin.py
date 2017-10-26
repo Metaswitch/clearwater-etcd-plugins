@@ -15,13 +15,11 @@ class SharedIfcsXml(ConfigType):
     # file_download_name is used to agree with the current naming system when
     # writing to file.
     file_download_name = 'shared_ifcs.xml'
-    # file_etcd_name is the name to find the config file in clearwater-etcd
-    file_etcd_name = 'shared_ifcs'
+
     # This help_info appears as user-visible help text in the usage statement
     # for cw-config.
-    help_info = ('shared_ifcs is the shared_ifcs.xml this is a list of iFCs'
-                 'that are common to many subscribers. This is identified by a'
-                 'Shared iFC set ID ')
+    help_info = ('shared_ifcs is the shared_ifcs.xml this  combine a list of'
+                 ' iFCs used by many subscribers. \n')
     schema = '/usr/share/clearwater/clearwater-config-manager/scripts/config_validation/shared_ifcs_schema.xsd'
 
 
