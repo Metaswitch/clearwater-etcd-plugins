@@ -18,9 +18,9 @@ class BgcfJson(ConfigType):
 
     # This help_info appears as user-visible help text in the usage statement
     # for cw-config.
-    help_info = ('bgcf_json stores the system configuration of BGCF and '
-                 'defines how your deployment will handle calls that are '
-                 'routed to the BGCF. \n')
+    help_info = ('''bgcf_json - stores the system configuration of BGCF and
+              defines how your deployment will handle calls
+              that are routed to the BGCF.''')
     schema = '/usr/share/clearwater/clearwater-config-manager/scripts/config_validation/bgcf_schema.json'
 
 

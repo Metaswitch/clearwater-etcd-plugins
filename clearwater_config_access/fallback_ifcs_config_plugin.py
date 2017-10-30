@@ -19,8 +19,8 @@ class FallbackIfcsXml(ConfigType):
 
     # This help_info appears as user-visible help text in the usage statement
     # for cw-config.
-    help_info = ('fallback_ifcs is the fallback_ifcs.xml this are used if no '
-                 'relevant iFC can be found for a subscriber. \n')
+    help_info = ('''fallback_ifcs - is the fallback_ifcs.xml this are used if no
+              relevant iFC can be found for a subscriber.''')
     schema = '/usr/share/clearwater/clearwater-config-manager/scripts/config_validation/fallback_ifcs_schema.xsd'
 
 

@@ -19,8 +19,8 @@ class EnumJson(ConfigType):
 
     # This help_info appears as user-visible help text in the usage statement
     # for cw-config.
-    help_info = ('enum.json is for storing dialled telephone numbers into '
-                 'internet addresses(URI)')
+    help_info = ('''enum_json - allows you to use file based ENUM, which translates
+              dialed telephone numbers into resolvable SIP URIs.''')
     schema = '/usr/share/clearwater/clearwater-config-manager/scripts/config_validation/enum_schema.json'
 
 

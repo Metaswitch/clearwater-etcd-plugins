@@ -19,8 +19,8 @@ class ScscfJson(ConfigType):
 
     # This help_info appears as user-visible help text in the usage statement
     # for cw-config.
-    help_info = ('scscf_json stores the configuration, capabilities, '
-                 'relative weightings and priority of each S-CSCF. \n')
+    help_info = ('''scscf_json - is s-cscf stores the configuration, capabilities,
+              relative weightings and priority of each S-CSCF.''')
     schema = '/usr/share/clearwater/clearwater-config-manager/scripts/config_validation/scscf_schema.json'
 
 

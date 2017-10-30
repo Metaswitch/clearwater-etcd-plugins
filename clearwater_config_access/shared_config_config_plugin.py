@@ -18,8 +18,8 @@ class SharedConfig(ConfigType):
     file_download_name = 'shared_config'
     # This help_info appears as user-visible help text in the usage statement
     # for cw-config.
-    help_info = ('shared_config contains core options, advanced options, and '
-                 'OAN configuration. \n')
+    help_info = ('''shared_config - contains cluster wide general shared
+              configuration.''')
 
 def load_as_plugin(params):
     return SharedConfig(params)

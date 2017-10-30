@@ -18,8 +18,8 @@ class SharedIfcsXml(ConfigType):
 
     # This help_info appears as user-visible help text in the usage statement
     # for cw-config.
-    help_info = ('shared_ifcs is the shared_ifcs.xml this  combine a list of'
-                 ' iFCs used by many subscribers. \n')
+    help_info = ('''shared_ifcs - is the shared_ifcs.xml this  combine a list of
+              iFCs used by many subscribers.''')
     schema = '/usr/share/clearwater/clearwater-config-manager/scripts/config_validation/shared_ifcs_schema.xsd'
 
 
