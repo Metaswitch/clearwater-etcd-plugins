@@ -15,7 +15,7 @@ class ScscfJson(ConfigType):
     filetype = 'json'
     # file_download_name is used to agree with the current naming system when
     # writing to file.
-    file_download_name = 'scscf.json'
+    file_download_name = 's-cscf.json'
 
     # This help_info appears as user-visible help text in the usage statement
     # for cw-config.
