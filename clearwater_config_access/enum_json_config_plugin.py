@@ -24,5 +24,5 @@ class EnumJson(ConfigType):
     schema = '/usr/share/clearwater/clearwater-config-manager/scripts/config_validation/enum_schema.json'
 
 
-def load_as_plugin(params):
+def load_as_plugin(params):  # pragma: no cover
     return EnumJson(params)

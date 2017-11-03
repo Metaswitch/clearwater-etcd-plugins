@@ -24,5 +24,5 @@ class ScscfJson(ConfigType):
     schema = '/usr/share/clearwater/clearwater-config-manager/scripts/config_validation/scscf_schema.json'
 
 
-def load_as_plugin(params):
+def load_as_plugin(params):  # pragma: no cover
     return ScscfJson(params)

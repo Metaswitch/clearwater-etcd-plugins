@@ -23,5 +23,5 @@ class SharedIfcsXml(ConfigType):
     schema = '/usr/share/clearwater/clearwater-config-manager/scripts/config_validation/shared_ifcs_schema.xsd'
 
 
-def load_as_plugin(params):
+def load_as_plugin(params):  # pragma: no cover
     return SharedIfcsXml(params)

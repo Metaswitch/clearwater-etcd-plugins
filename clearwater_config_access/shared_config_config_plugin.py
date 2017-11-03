@@ -21,5 +21,5 @@ class SharedConfig(ConfigType):
     help_info = ('''shared_config - contains cluster wide general shared
               configuration.''')
 
-def load_as_plugin(params):
+def load_as_plugin(params):  # pragma: no cover
     return SharedConfig(params)

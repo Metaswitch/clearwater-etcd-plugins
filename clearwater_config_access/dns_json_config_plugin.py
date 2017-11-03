@@ -24,5 +24,5 @@ class DnsJson(ConfigType):
     schema = '/usr/share/clearwater/clearwater-config-manager/scripts/config_validation/dns_schema.json'
 
 
-def load_as_plugin(params):
+def load_as_plugin(params):   # pragma: no cover
     return DnsJson(params)
