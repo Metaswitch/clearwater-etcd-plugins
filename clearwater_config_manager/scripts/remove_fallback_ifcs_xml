@@ -20,7 +20,7 @@ then
   exit 2
 fi
 
-clearwater-etcdctl set /$etcd_key/$local_site_name/configuration/fallback_ifcs "<?xml version="1.0" encoding="UTF-8"?><FallbackIFCsSet></FallbackIFCsSet>" 2> /tmp/remove-fallback-ifcs-xml.stderr.$$ > /tmp/remove-fallback-ifcs-xml.stdout.$$
+clearwater-etcdctl set /$etcd_key/$local_site_name/configuration/fallback_ifcs "<?xml version=\"1.0\" encoding=\"UTF-8\"?><FallbackIFCsSet></FallbackIFCsSet>" 2> /tmp/remove-fallback-ifcs-xml.stderr.$$ > /tmp/remove-fallback-ifcs-xml.stdout.$$
 rc=$?
 
 # Check the return code and log if appropriate.
