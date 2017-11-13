@@ -37,7 +37,7 @@ class RphJson(ConfigType):
     def validate(self):
         """ Validate using custom validation script. """
         validate_script = ['python', self.validation_file, self.schema,
-                            self.configfile]
+                           self.configfile]
         failed_scripts = []
         error_lines = []
 
