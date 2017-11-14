@@ -13,6 +13,7 @@ from metaswitch.clearwater.config_manager.config_type_class_plugin import Config
 LOG_DIR = "/var/log/clearwater-config-manager"
 log = logging.getLogger("cw-config.validate")
 
+
 class RphJson(ConfigType):
     def __init__(self, configpath):
         """ Initialise the class variables. """
@@ -25,14 +26,13 @@ class RphJson(ConfigType):
         # when writing to file
         self.file_download_name = 'rph.json'
 
-        # This help_info appears as user-visible help text in the usage statement
-        # for cw-config.
+        # This help_info appears as user-visible help text in the usage
+        # statement for cw-config.
         self.help_info = ('''rph_json - maps different resource priority header
-                values to an internal priority value.''')
+                             values to an internal priority value.''')
 
         self.schema = '/usr/share/clearwater/clearwater-config-manager/scripts/config_validation/rph_schema.json'
         self.validation_file = '/usr/share/clearwater/clearwater-config-manager/scripts/config_validation/rph_validation.py'
-
 
     def validate(self):
         """ Validate using custom validation script. """

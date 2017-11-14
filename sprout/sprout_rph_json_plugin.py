@@ -77,6 +77,7 @@ _default_value = """\
     ]
 }"""
 
+
 class RPHJSONPlugin(ConfigPluginBase):
     def __init__(self, _params):
         pass
@@ -108,6 +109,7 @@ class RPHJSONPlugin(ConfigPluginBase):
             safely_write(_file, value)
             run_command(["/usr/share/clearwater/bin/reload_rph_json"])
             alarm.update_file(_file)
+
 
 def load_as_plugin(params):  # pragma: no cover
     return RPHJSONPlugin(params)
