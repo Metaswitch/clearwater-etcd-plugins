@@ -14,6 +14,7 @@ sys.path.append(os.path.dirname(__file__))
 
 _log = logging.getLogger("sprout_rph_json_plugin")
 
+
 class SproutRPHJsonPlugin(SproutJsonPlugin):
     def __init__(self, _params):
         super(SproutRPHJsonPlugin, self).__init__("/etc/clearwater/rph.json",
