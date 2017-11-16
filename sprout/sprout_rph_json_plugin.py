@@ -19,7 +19,7 @@ class SproutRPHJsonPlugin(SproutJsonPlugin):
     def __init__(self, _params):
         super(SproutRPHJsonPlugin, self).__init__("/etc/clearwater/rph.json",
                                                   "rph_json")
-        _default_value = """\
+    _default_value = """\
 {
     "priority_blocks": [
         {
