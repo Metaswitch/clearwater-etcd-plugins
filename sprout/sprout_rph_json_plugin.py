@@ -5,12 +5,12 @@
 # Otherwise no rights are granted except for those provided to you by
 # Metaswitch Networks in a separate written agreement.
 
-from sprout_json_plugin import SproutJsonPlugin
 import logging
 import os
 import sys
 
 sys.path.append(os.path.dirname(__file__))
+from sprout_json_plugin import SproutJsonPlugin
 
 _log = logging.getLogger("sprout_rph_json_plugin")
 
