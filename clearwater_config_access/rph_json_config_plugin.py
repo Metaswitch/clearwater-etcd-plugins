@@ -29,7 +29,7 @@ class RphJson(ConfigType):
         # This help_info appears as user-visible help text in the usage
         # statement for cw-config.
         self.help_info = ('''rph_json - maps different resource priority header
-                values to an internal priority value.''')
+              values to an internal priority value.''')
 
         self.schema = '/usr/share/clearwater/clearwater-config-manager/scripts/config_validation/rph_schema.json'
         self.validation_file = '/usr/share/clearwater/clearwater-config-manager/scripts/config_validation/rph_validation.py'
