@@ -40,10 +40,16 @@ class RphJson(ConfigType):
                            self.configfile]
         failed_scripts = []
         error_lines = []
+        passed_scripts = []
+        success_lines = []
 
         try:
             log.debug("Running validation script rph_validation.py")
-            subprocess.check_output(validate_script, stderr=subprocess.STDOUT)
+            output = subprocess.check_output(validate_script,
+                                             stderr=subprocess.STDOUT)
+            out_msg = output.splitlines()
+            success_lines.extend(out_msg)
+            passed_scripts.append("rph_validation.py")
         except subprocess.CalledProcessError as exc:
             log.error("Validation script rph_validation.py failed")
             log.error("Reasons for failure:")
@@ -56,7 +62,7 @@ class RphJson(ConfigType):
 
             failed_scripts.append('rph_validation.py')
 
-        return failed_scripts, error_lines
+        return failed_scripts, error_lines, passed_scripts, success_lines
 
 
 def load_as_plugin(params):  # pragma: no cover
