@@ -19,8 +19,7 @@ class BgcfJson(ConfigType):
 
     # This help_info appears as user-visible help text in the usage statement
     # for cw-config.
-    help_info = ('''bgcf_json - this stores the configuration of each
-                    BGCF.''')
+    help_info = ('bgcf_json - this stores the configuration of each BGCF.')
     schema = '/usr/share/clearwater/clearwater-config-manager/scripts/config_validation/bgcf_schema.json'
 
 
