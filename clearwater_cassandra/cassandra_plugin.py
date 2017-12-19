@@ -96,7 +96,7 @@ class CassandraPlugin(SynchroniserPluginBase):
 
         # Read cassandra.yaml template.
         with open(self.CASSANDRA_YAML_TEMPLATE) as f:
-            doc = yaml.load(f)
+            doc = yaml.safe_load(f)
 
         # Fill in the correct listen_address and seeds values in the yaml
         # document.
