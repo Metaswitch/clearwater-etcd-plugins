@@ -6,7 +6,7 @@
 # Metaswitch Networks in a separate written agreement.
 
 from metaswitch.clearwater.queue_manager.plugin_base import QueuePluginBase
-from metaswitch.clearwater.etcd_shared.plugin_utils import run_command
+from metaswitch.clearwater.etcd_shared.plugin_utils import run_commands, run_command
 import logging
 import os
 import subprocess
@@ -26,11 +26,12 @@ class ApplyConfigPlugin(QueuePluginBase):
         _log.info("Restarting clearwater-infrastructure")
         run_command(["service", "clearwater-infrastructure", "restart"])
 
-        if os.path.exists("/usr/share/clearwater/infrastructure/scripts/restart"):
-            _log.info("Restarting services")
-            for restart_script in os.listdir("/usr/share/clearwater/infrastructure/scripts/restart"):
-                run_command(["/usr/share/clearwater/infrastructure/scripts/restart/"
-                    + restart_script])
+        script_dir = "/usr/share/clearwater/infrastructure/scripts/restart/"
+        if os.path.exists(script_dir):
+            restart_scripts = os.listdir(script_dir)
+            _log.info("Restarting %d services", len(restart_scripts))
+            run_commands([[script_dir + restart_script]
+                          for restart_script in restart_scripts])
  
         if self._wait_plugin_complete != "N":
             _log.info("Checking service health")
