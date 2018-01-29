@@ -5,7 +5,7 @@
 # Otherwise no rights are granted except for those provided to you by
 # Metaswitch Networks in a separate written agreement.
 
-"""This contains the dns json subclass of ConfigType"""
+"""This contains the sas json subclass of ConfigType"""
 
 from metaswitch.clearwater.config_manager.config_type_class_plugin import ConfigType
 
@@ -21,6 +21,7 @@ class SasJson(ConfigType):
     # for cw-config.
     help_info = ('''sas_json - contains the list of configured SAS servers to which
               SAS logs are sent.''')
+    schema = '/usr/share/clearwater/clearwater-config-manager/scripts/config_validation/sas_schema.json'
 
 
 def load_as_plugin(params):   # pragma: no cover
