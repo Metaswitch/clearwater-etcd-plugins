@@ -46,6 +46,7 @@ class SASJSONPlugin(ConfigPluginBase):
 
         if self.status(value) != FileStatus.UP_TO_DATE:
             safely_write(_file, value)
+            run_command(["/usr/share/clearwater/infrastructure/scripts/sas_socket_factory"])
             run_command(["/usr/share/clearwater/bin/reload_sas_json"])
             alarm.update_file(_file)
 
