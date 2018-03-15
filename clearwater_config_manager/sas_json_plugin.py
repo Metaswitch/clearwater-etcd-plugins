@@ -42,7 +42,7 @@ class SASJSONPlugin(ConfigPluginBase):
 
         if ip_addrs[0] is not None:
             try:
-                ipaddress.ipaddress(ip_addrs[0])
+                ipaddress.ip_address(ip_addrs[0])
             except ValueError:
                 ip_addrs = resolve_domain_address_in_namespace(ip_addrs[0], sas_use_signaling_interface)
 
