@@ -8,13 +8,12 @@
 from metaswitch.clearwater.config_manager.plugin_base import ConfigPluginBase, FileStatus
 from metaswitch.clearwater.etcd_shared.plugin_utils import run_command, safely_write
 
+import dns.resolver
 import ipaddress
 import json
 import logging
 import os
 import subprocess
-
-import dns.resolver
 
 _log = logging.getLogger("sas_json_plugin")
 _file = "/etc/clearwater/sas.json"
@@ -23,7 +22,6 @@ _default_value = """\
   "sas_servers": [
   ]
 }"""
-
 
 class SASJSONPlugin(ConfigPluginBase):
     def __init__(self, _params):
@@ -123,11 +121,7 @@ class SASJSONPlugin(ConfigPluginBase):
             dns_answers = self.resolve_domain_address(addr)
 
         ip_addrs = [ip.address for ip in dns_answers]
-
         return ip_addrs
-
-
-
 
 def load_as_plugin(params):  # pragma: no cover
     return SASJSONPlugin(params)
