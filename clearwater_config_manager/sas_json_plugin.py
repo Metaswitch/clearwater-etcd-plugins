@@ -112,9 +112,9 @@ class SASJSONPlugin(ConfigPluginBase):
                 with Namespace('/var/run/netns/' + sig_ns, 'net'):
                     ip_addrs = self.resolve_domain_address(addr, sig_dns)
             else:
-                ip_addrs = resolve_domain_address(addr, sig_dns)
+                ip_addrs = self.resolve_domain_address(addr, sig_dns)
         else:
-            ip_addrs = resolve_domain_address(addr)
+            ip_addrs = self.resolve_domain_address(addr)
 
         return ip_addrs
 
