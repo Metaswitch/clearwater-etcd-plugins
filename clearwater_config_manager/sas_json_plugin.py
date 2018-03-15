@@ -36,21 +36,23 @@ class SASJSONPlugin(ConfigPluginBase):
         return _file
 
     def default_value(self):
+        # If a value is set for sas_server, we should resolve it and set that as the default
         ip_addrs = [subprocess.check_output(['bash', '-c', '. /etc/clearwater/config; echo -n $sas_server'])]
-        print("CJR")
-        print(ip_addrs)
         sas_use_signaling_interface = subprocess.check_output(
             ['bash', '-c', '. /etc/clearwater/config; echo -n $sas_use_signaling_interface'])
 
         if ip_addrs[0]: # pragma: no cover
             try:
+                # Check if it's an IP address
                 ipaddress.ip_address(ip_addrs[0])
             except ValueError:
+                # It's not an IP address, so try and resolve as a domain address.
                 ip_addrs = self.resolve_domain_address_in_namespace(ip_addrs[0], sas_use_signaling_interface)
 
             sas_config = {"sas_servers": [{"ip": addr} for addr in ip_addrs]}
             sas_json = json.dumps(sas_config)
         else:
+            # No value set for sas_server, so returning an empty config file.
             sas_json = _default_value
 
         return sas_json
@@ -78,6 +80,7 @@ class SASJSONPlugin(ConfigPluginBase):
     def resolve_domain_address(self, addr, dns_server=None): # pragma: no cover
         ip_addrs = []
 
+        # Ensure we're using the correct dns server.
         if dns_server:
             dns.resolver.override_system_resolver()
             dns.resolver.get_default_resolver().nameservers = dns_server.split(',')
@@ -97,6 +100,7 @@ class SASJSONPlugin(ConfigPluginBase):
             # just return an empty list.
             pass
 
+        # Revert changes to the dns server
         if dns_server:
             dns.resolver.restore_system_resolver()
             dns.resolver.reset_default_resolver()
