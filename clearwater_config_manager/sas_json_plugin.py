@@ -37,10 +37,12 @@ class SASJSONPlugin(ConfigPluginBase):
 
     def default_value(self):
         ip_addrs = [subprocess.check_output(['bash', '-c', '. /etc/clearwater/config; echo -n $sas_server'])]
+        print("CJR")
+        print(ip_addrs)
         sas_use_signaling_interface = subprocess.check_output(
             ['bash', '-c', '. /etc/clearwater/config; echo -n $sas_use_signaling_interface'])
 
-        if ip_addrs[0] is not None:
+        if ip_addrs[0]: # pragma: no cover
             try:
                 ipaddress.ip_address(ip_addrs[0])
             except ValueError:
@@ -49,7 +51,7 @@ class SASJSONPlugin(ConfigPluginBase):
             sas_config = {"sas_servers": [{"ip": addr} for addr in ip_addrs]}
             sas_json = json.dumps(sas_config)
         else:
-            sas_json = _default
+            sas_json = _default_value
 
         return sas_json
 
@@ -73,7 +75,7 @@ class SASJSONPlugin(ConfigPluginBase):
             run_command(["/usr/share/clearwater/bin/reload_sas_json"])
             alarm.update_file(_file)
 
-    def resolve_domain_address(self, addr, dns_server=None):
+    def resolve_domain_address(self, addr, dns_server=None): # pragma: no cover
         ip_addrs = []
 
         if dns_server:
@@ -101,7 +103,7 @@ class SASJSONPlugin(ConfigPluginBase):
 
         return ip_addrs
 
-    def resolve_domain_address_in_namespace(self, addr, is_signaling):
+    def resolve_domain_address_in_namespace(self, addr, is_signaling): # pragma: no cover
         dns_answers = []
 
         if is_signaling == 'Y':
