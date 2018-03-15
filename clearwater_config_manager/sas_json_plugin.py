@@ -44,7 +44,7 @@ class SASJSONPlugin(ConfigPluginBase):
             try:
                 ipaddress.ip_address(ip_addrs[0])
             except ValueError:
-                ip_addrs = resolve_domain_address_in_namespace(ip_addrs[0], sas_use_signaling_interface)
+                ip_addrs = self.resolve_domain_address_in_namespace(ip_addrs[0], sas_use_signaling_interface)
 
             sas_config = {"sas_servers": [{"ip": addr} for addr in ip_addrs]}
             sas_json = json.dumps(sas_config)
@@ -73,23 +73,6 @@ class SASJSONPlugin(ConfigPluginBase):
             run_command(["/usr/share/clearwater/bin/reload_sas_json"])
             alarm.update_file(_file)
 
-    def resolve_domain_address_in_namespace(self, addr, is_signaling):
-        ip_addrs = []
-
-        if is_signaling == 'Y':
-            sig_ns = os.environ.get('signaling_namespace')
-            sig_dns = os.environ.get('signaling_dns_server')
-
-            if sig_ns:
-                with Namespace('/var/run/netns/' + sig_ns, 'net'):
-                    ip_addrs = resolve_domain_address(addr, sig_dns)
-            else:
-                ip_addrs = resolve_domain_address(addr, sig_dns)
-        else:
-            ip_addrs = resolve_domain_address(addr)
-
-        return ip_addrs
-
     def resolve_domain_address(self, addr, dns_server=None):
         ip_addrs = []
 
@@ -115,6 +98,23 @@ class SASJSONPlugin(ConfigPluginBase):
         if dns_server:
             dns.resolver.restore_system_resolver()
             dns.resolver.reset_default_resolver()
+
+        return ip_addrs
+
+    def resolve_domain_address_in_namespace(self, addr, is_signaling):
+        ip_addrs = []
+
+        if is_signaling == 'Y':
+            sig_ns = os.environ.get('signaling_namespace')
+            sig_dns = os.environ.get('signaling_dns_server')
+
+            if sig_ns:
+                with Namespace('/var/run/netns/' + sig_ns, 'net'):
+                    ip_addrs = self.resolve_domain_address(addr, sig_dns)
+            else:
+                ip_addrs = resolve_domain_address(addr, sig_dns)
+        else:
+            ip_addrs = resolve_domain_address(addr)
 
         return ip_addrs
 
