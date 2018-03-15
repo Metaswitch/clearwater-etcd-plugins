@@ -102,7 +102,6 @@ class SASJSONPlugin(ConfigPluginBase):
         return ip_addrs
 
     def resolve_domain_address_in_namespace(self, addr, is_signaling):
-        ip_addrs = []
         dns_answers = []
 
         if is_signaling == 'Y':
@@ -117,8 +116,7 @@ class SASJSONPlugin(ConfigPluginBase):
         else:
             dns_answers = self.resolve_domain_address(addr)
 
-        for dns_answer in dns_answers:
-            ip_addrs.append(dns_answer.rdata)
+        ip_addrs = [ip.address for ip in dns_answers]
 
         return ip_addrs
 
