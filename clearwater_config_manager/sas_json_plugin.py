@@ -7,6 +7,7 @@
 
 from metaswitch.clearwater.config_manager.plugin_base import ConfigPluginBase, FileStatus
 from metaswitch.clearwater.etcd_shared.plugin_utils import run_command, safely_write
+from nsenter import Namespace
 
 import dns.resolver
 import ipaddress
