@@ -36,9 +36,13 @@ class SASJSONPlugin(ConfigPluginBase):
 
     def default_value(self):
         # If a value is set for sas_server, we should resolve it and set that as the default
+        is_signaling = False
         ip_addrs = [subprocess.check_output(['bash', '-c', '. /etc/clearwater/config; echo -n $sas_server'])]
-        sas_use_signaling_interface = subprocess.check_output(
+        sas_use_signaling_interface_var = subprocess.check_output(
             ['bash', '-c', '. /etc/clearwater/config; echo -n $sas_use_signaling_interface'])
+
+        if sas_use_signaling_interface_var == "Y": # pragma: no cover
+            is_signaling = True
 
         if ip_addrs[0]: # pragma: no cover
             try:
@@ -46,7 +50,7 @@ class SASJSONPlugin(ConfigPluginBase):
                 ipaddress.ip_address(ip_addrs[0])
             except ValueError:
                 # It's not an IP address, so try and resolve as a domain address.
-                ip_addrs = self.resolve_domain_address_in_namespace(ip_addrs[0], sas_use_signaling_interface)
+                ip_addrs = resolve_domain_address_in_namespace(ip_addrs[0], is_signaling)
 
             sas_config = {"sas_servers": [{"ip": addr} for addr in ip_addrs]}
             sas_json = json.dumps(sas_config)
@@ -76,53 +80,53 @@ class SASJSONPlugin(ConfigPluginBase):
             run_command(["/usr/share/clearwater/bin/reload_sas_json"])
             alarm.update_file(_file)
 
-    def resolve_domain_address(self, addr, dns_server=None): # pragma: no cover
-        ip_addrs = []
+def resolve_domain_address(addr, dns_server=None): # pragma: no cover
+    ip_addrs = []
 
-        # Ensure we're using the correct dns server.
-        if dns_server:
-            dns.resolver.override_system_resolver()
-            dns.resolver.get_default_resolver().nameservers = dns_server.split(',')
+    # Ensure we're using the correct dns server.
+    if dns_server:
+        dns.resolver.override_system_resolver()
+        dns.resolver.get_default_resolver().nameservers = dns_server.split(',')
 
-        try:
-            resolver = dns.resolver.get_default_resolver()
+    try:
+        resolver = dns.resolver.get_default_resolver()
 
-            # timeout is the time spent waiting for each DNS server.
-            # lifetime is the time spent waiting for a response overall.
-            # By setting timeout to 2 and lifetime to 4, we allow time for us to
-            # check at least 2 of our DNS servers before we give up.
-            resolver.timeout = 2.0
-            resolver.lifetime = 4.0
-            ip_addrs = resolver.query(addr)
-        except Exception:
-            # If something goes wrong, we can't resolve the address so we'll
-            # just return an empty list.
-            pass
+        # timeout is the time spent waiting for each DNS server.
+        # lifetime is the time spent waiting for a response overall.
+        # By setting timeout to 2 and lifetime to 4, we allow time for us to
+        # check at least 2 of our DNS servers before we give up.
+        resolver.timeout = 2.0
+        resolver.lifetime = 4.0
+        ip_addrs = resolver.query(addr)
+    except Exception:
+        # If something goes wrong, we can't resolve the address so we'll
+        # just return an empty list.
+        pass
 
-        # Revert changes to the dns server
-        if dns_server:
-            dns.resolver.restore_system_resolver()
-            dns.resolver.reset_default_resolver()
+    # Revert changes to the dns server
+    if dns_server:
+        dns.resolver.restore_system_resolver()
+        dns.resolver.reset_default_resolver()
 
-        return ip_addrs
+    return ip_addrs
 
-    def resolve_domain_address_in_namespace(self, addr, is_signaling): # pragma: no cover
-        dns_answers = []
+def resolve_domain_address_in_namespace(addr, is_signaling): # pragma: no cover
+    dns_answers = []
 
-        if is_signaling == 'Y':
-            sig_ns = os.environ.get('signaling_namespace')
-            sig_dns = os.environ.get('signaling_dns_server')
+    if is_signaling:
+        sig_ns = os.environ.get('signaling_namespace')
+        sig_dns = os.environ.get('signaling_dns_server')
 
-            if sig_ns:
-                with Namespace('/var/run/netns/' + sig_ns, 'net'):
-                    dns_answers = self.resolve_domain_address(addr, sig_dns)
-            else:
-                dns_answers = self.resolve_domain_address(addr, sig_dns)
+        if sig_ns:
+            with Namespace('/var/run/netns/' + sig_ns, 'net'):
+                dns_answers = resolve_domain_address(addr, sig_dns)
         else:
-            dns_answers = self.resolve_domain_address(addr)
+            dns_answers = resolve_domain_address(addr, sig_dns)
+    else:
+        dns_answers = resolve_domain_address(addr)
 
-        ip_addrs = [ip.address for ip in dns_answers]
-        return ip_addrs
+    ip_addrs = [ip.address for ip in dns_answers]
+    return ip_addrs
 
 def load_as_plugin(params):  # pragma: no cover
     return SASJSONPlugin(params)
