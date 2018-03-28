@@ -54,7 +54,7 @@ class SASJSONPlugin(ConfigPluginBase):
 
             sas_config = {"sas_servers": [{"ip": addr} for addr in ip_addrs]}
             sas_json = json.dumps(sas_config)
-        else:
+        else: # pragma: no cover
             # No value set for sas_server, so returning an empty config file.
             sas_json = _default_value
 
