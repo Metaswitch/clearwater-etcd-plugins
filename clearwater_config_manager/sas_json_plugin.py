@@ -76,8 +76,12 @@ class SASJSONPlugin(ConfigPluginBase):
 
         if self.status(value) != FileStatus.UP_TO_DATE:
             safely_write(_file, value)
+
             run_command(["/usr/share/clearwater/infrastructure/scripts/sas_socket_factory"])
-            run_command(["/usr/share/clearwater/bin/reload_sas_json"])
+            apply_config_key = subprocess.check_output(["/usr/share/clearwater/clearwater-queue-manager/scripts/get_apply_config_key"])
+            run_command(["/usr/share/clearwater/clearwater-queue-manager/scripts/modify_nodes_in_queue",
+                         "add", apply_config_key])
+
             alarm.update_file(_file)
 
 def resolve_domain_address(addr, dns_server=None): # pragma: no cover
